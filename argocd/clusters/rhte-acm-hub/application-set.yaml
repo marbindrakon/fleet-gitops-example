@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-configs
+  namespace: openshift-gitops
+spec:
+  generators:
+  - git:
+      repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+      revision: HEAD
+      directories:
+      - path: argocd/clusters/rhte-acm-hub/live/*
+  template:
+    metadata:
+      name: "{{ path.basename }}"
+    spec:
+      project: default
+      syncPolicy:
+        automated: {}
+      destination:
+        namespace: openshift-gitops
+        server: "https://kubernetes.default.svc"
+      source:
+        repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+        targetRevision: HEAD
+        path: "{{ path }}"
