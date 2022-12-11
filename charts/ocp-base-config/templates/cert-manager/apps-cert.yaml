@@ -23,7 +23,6 @@ spec:
     - server auth
     - client auth
   dnsNames:
-    - "apps.{{ .Values.cluster.name }}.{{ .Values.cluster.baseDomain }}"
     - "*.apps.{{ .Values.cluster.name }}.{{ .Values.cluster.baseDomain }}"
   issuerRef:
     name: cluster-acme
