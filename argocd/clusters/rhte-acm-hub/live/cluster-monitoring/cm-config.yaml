@@ -1,0 +1,53 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    alertmanagerMain:
+      volumeClaimTemplate:
+       spec:
+         storageClassName: ocs-external-storagecluster-ceph-rbd
+         resources:
+           requests:
+             storage: 5Gi
+    enableUserWorkload: null
+    grafana: null
+    http: null
+    k8sPrometheusAdapter: null
+    kubeStateMetrics: null
+    openshiftStateMetrics: null
+    prometheusK8s:
+      additionalAlertManagerConfigs:
+      - apiVersion: v2
+        bearerToken:
+          key: token
+          name: observability-alertmanager-accessor
+        pathPrefix: /
+        scheme: https
+        staticConfigs:
+        - alertmanager-open-cluster-management-observability.apps.rhte-acm-hub.lab.signal9.gg
+        tlsConfig:
+          ServerName: ""
+          ca:
+            key: service-ca.crt
+            name: hub-alertmanager-router-ca
+          insecureSkipVerify: false
+      externalLabels:
+        cluster: dd6f0eb2-437a-48fe-9ba0-4e85ff61d0dc
+      logLevel: ""
+      nodeSelector: null
+      remoteWrite: null
+      resources: null
+      retention: "7d"
+      tolerations: null
+      volumeClaimTemplate:
+       spec:
+         storageClassName: ocs-external-storagecluster-ceph-rbd
+         resources:
+           requests:
+             storage: 50Gi
+    prometheusOperator: null
+    telemeterClient: null
+    thanosQuerier: null
