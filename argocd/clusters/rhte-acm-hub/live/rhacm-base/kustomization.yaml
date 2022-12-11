@@ -8,5 +8,5 @@ resources:
   - mco-pull-secret.yaml
   - mco-obc.yaml
   # These must be re-enabled after adding the s3 bucket credentials to vault
-  #- thanos-secret.yaml
-  #- mco.yaml
+  - thanos-secret.yaml
+  - mco.yaml
