@@ -1,0 +1,42 @@
+cluster:
+  name: rhte-acm-hub
+  baseDomain: lab.signal9.gg
+
+externalSecrets:
+  enabled: true
+  vaultBase: 'https://vault.lab.signal9.gg'
+  vaultAuthPath: 'k8s-ocp'
+  secretBasePath: lab/rht-shared
+
+certManager:
+  enabled: true
+  apiCert: true
+  defaultIngressCert: true
+  acmeBase: 'https://acme-ca.lab.signal9.gg:8443/acme/directory'
+  externalSecret:
+    name: ipa-tsig
+    vaultName: ipa-tsig
+  solvers:
+    - http01:
+        ingress: {}
+    - dns01:
+        rfc2136:
+          nameserver: xna-ipa-1.home.signal9.gg
+          tsigKeyName: cert-manager
+          tsigAlgorithm: HMACSHA256
+          tsigSecretSecretRef:
+            name: ipa-tsig
+            key: key
+
+monitoring:
+  enabled: true
+  storageClass: standard
+
+auth:
+  enabled: true
+  oidcDisplayName: Signal9-RHT
+  oidcClientID: openshift
+  oidcIssuer: https://login.home.signal9.gg/auth/realms/Signal9-RHT
+  externalSecret:
+    name: oauth-signal9-client-secret
+    vaultName: signal9-openid

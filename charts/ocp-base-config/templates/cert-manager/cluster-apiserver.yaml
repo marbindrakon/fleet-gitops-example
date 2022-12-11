@@ -1,0 +1,17 @@
+{{- if and .Values.certManager.enabled .Values.certManager.apiCert -}}
+apiVersion: config.openshift.io/v1
+kind: APIServer
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  encryption:
+    type: aescbc
+  servingCerts:
+    namedCertificates:
+    - names:
+      - api.{{ .Values.cluster.name }}.{{ .Values.cluster.baseDomain }}
+      servingCertificate:
+        name: acme-api
+{{ end }}

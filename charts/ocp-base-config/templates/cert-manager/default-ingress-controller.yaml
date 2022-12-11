@@ -1,0 +1,12 @@
+{{- if and .Values.certManager.enabled .Values.certManager.defaultIngressCert -}}
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  name: default
+  namespace: openshift-ingress-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  defaultCertificate:
+    name: acme-apps
+{{ end }}

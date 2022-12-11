@@ -1,0 +1,12 @@
+{{- if .Values.externalSecrets.enabled -}}
+apiVersion: operators.coreos.com/v1alpha2
+kind: OperatorGroup
+metadata:
+  name: external-secrets
+  namespace: external-secrets-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+spec:
+  targetNamespaces:
+    - external-secrets-operator
+{{ end }}

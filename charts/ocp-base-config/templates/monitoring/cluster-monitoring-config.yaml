@@ -1,0 +1,24 @@
+{{- if .Values.monitoring.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    alertmanagerMain:
+      volumeClaimTemplate:
+       spec:
+         storageClassName: {{ .Values.monitoring.storageClass }}
+         resources:
+           requests:
+             storage: 10Gi
+    prometheusK8s:
+      retention: 7d
+      volumeClaimTemplate:
+       spec:
+         storageClassName: {{ .Values.monitoring.storageClass }}
+         resources:
+           requests:
+             storage: 50Gi
+{{ end }}

@@ -1,0 +1,11 @@
+{{- if .Values.certManager.enabled -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-cert-manager-operator
+  labels:
+    openshift.io/cluster-monitoring: 'true'
+  annotations:
+    argocd.argoproj.io/sync-wave: '-2'
+spec: {}
+{{ end }}

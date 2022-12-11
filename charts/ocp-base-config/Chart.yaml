@@ -1,0 +1,9 @@
+apiVersion: v2
+name: ocp-base-config
+description: Base cluster configurations via Helm
+
+type: application
+
+version: 0.0.1
+
+appVersion: "4.11"

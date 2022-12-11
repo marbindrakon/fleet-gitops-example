@@ -1,0 +1,27 @@
+{{- if and .Values.auth.enabled .Values.auth.externalSecret -}}
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  identityProviders:
+  - mappingMethod: claim
+    name: {{ .Values.auth.oidcDisplayName }}
+    openID:
+      claims:
+        email:
+        - email
+        name:
+        - name
+        preferredUsername:
+        - preferred_username
+        - email
+      clientID: {{ .Values.auth.oidcClientID }}
+      clientSecret:
+        name: {{ .Values.auth.externalSecret.name }}
+      extraScopes: ["profile"]
+      issuer: {{ .Values.auth.oidcIssuer }}
+    type: OpenID
+{{ end }}

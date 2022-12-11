@@ -1,0 +1,16 @@
+{{- if .Values.certManager.enabled }}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cluster-acme
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  acme:
+    email: admin@signal9.gg
+    privateKeySecretRef:
+      name: {{ .Values.certManager.externalSecret.name }}
+    server: {{ .Values.certManager.acmeBase }}
+    solvers:
+{{ toYaml .Values.certManager.solvers | indent 6 }}
+{{ end }}

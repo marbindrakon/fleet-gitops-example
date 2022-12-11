@@ -1,0 +1,9 @@
+{{- if .Values.externalSecrets.enabled -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: external-secrets-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: '-2'
+spec: {}
+{{ end }}

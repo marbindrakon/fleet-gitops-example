@@ -1,0 +1,11 @@
+{{- if .Values.auth.enabled -}}
+apiVersion: user.openshift.io/v1
+kind: Group
+metadata:
+  name: global-admins
+users:
+  - aaustin
+  # Include both LDAP and Google names for Andrew H. just in case
+  - andharri
+  - andharri@redhat.com
+{{ end }}

@@ -1,0 +1,29 @@
+{{- if and .Values.certManager.enabled .Values.certManager.apiCert -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: api-certificate
+  namespace: openshift-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  secretName: acme-api
+  duration: 2160h0m0s # 90d
+  renewBefore: 360h0m0s # 15d
+  subject:
+    organizations:
+    - "Signal9 Labs"
+  privateKey:
+    size: 256
+    algorithm: ECDSA
+    encoding: PKCS1
+    rotationPolicy: Always
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - "api.{{ .Values.cluster.name }}.{{ .Values.cluster.baseDomain }}"
+  issuerRef:
+    name: cluster-acme
+    kind: ClusterIssuer
+{{ end }}
