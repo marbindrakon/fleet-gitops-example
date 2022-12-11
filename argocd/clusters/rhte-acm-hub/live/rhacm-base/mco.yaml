@@ -1,0 +1,103 @@
+apiVersion: observability.open-cluster-management.io/v1beta2
+kind: MultiClusterObservability
+metadata:
+  name: observability
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  enableDownsampling: true
+  advanced:
+    retentionConfig:
+      blockDuration: 3h
+      deleteDelay: 50h
+      retentionInLocal: 5d
+      retentionResolution1h: 31d
+      retentionResolution5m: 15d
+      retentionResolutionRaw: 6d
+    observatoriumAPI:
+      resources:
+        limits:
+          memory: 1Gi
+      replicas: 1
+    queryFrontend:
+      resources:
+        limits:
+          memory: 1Gi
+      replicas: 1
+    query:
+      resources:
+        limits:
+          memory: 1Gi
+      replicas: 1
+    compact:
+      resources:
+        limits:
+          memory: 2Gi
+    receive:
+      resources:
+        limits:
+          memory: 4Gi
+      replicas: 1
+    rule:
+      resources:
+        limits:
+          memory: 1Gi
+      replicas: 1
+    store:
+      resources:
+        limits:
+          memory: 2Gi
+      replicas: 1
+    storeMemcached:
+      resources:
+        limits:
+          memory: 2Gi
+      replicas: 1
+      memoryLimitMb: 2048
+      maxItemSize: 2m
+      connectionLimit: 2048
+    queryFrontendMemcached:
+      resources:
+        limits:
+          memory: 2Gi
+      replicas: 1
+      memoryLimitMb: 2048
+      maxItemSize: 2m
+      connectionLimit: 2048
+    grafana:
+      replicas: 1
+      resources:
+        limits:
+          memory: 1Gi
+    alertmanager:
+      replicas: 1
+      resources:
+        limits:
+          memory: 400Mi
+    rbacQueryProxy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 200Mi
+  nodeSelector:
+    kubernetes.io/os: linux
+  observabilityAddonSpec:
+    enableMetrics: true
+    interval: 30
+    resources:
+      limits:
+        memory: 700Mi
+      requests:
+        cpu: 10m
+        memory: 100Mi
+  storageConfig:
+    alertmanagerStorageSize: 1Gi
+    compactStorageSize: 50Gi
+    metricObjectStorage:
+      key: thanos.yaml
+      name: thanos-object-storage
+    receiveStorageSize: 50Gi
+    ruleStorageSize: 1Gi
+    storageClass: ocs-external-storagecluster-ceph-rbd
+    storeStorageSize: 5Gi

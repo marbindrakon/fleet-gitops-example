@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - rhacm-operator.yaml
+  - mch.yaml
+  - mco-namespace.yaml
+  - mco-pull-secret.yaml
+  - mco-obc.yaml
+  # These must be re-enabled after adding the s3 bucket credentials to vault
+  #- thanos-secret.yaml
+  #- mco.yaml
