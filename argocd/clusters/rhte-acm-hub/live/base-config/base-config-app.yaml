@@ -23,3 +23,20 @@ spec:
           enabled: false
         externalSecrets:
           vaultAuthPath: 'k8s-rhte-acm-hub'
+        certManager:
+          solvers:
+            - http01:
+                ingress: {}
+            - dns01:
+                route53:
+                  # Required prior to 1.9 when this can be moved to a 
+                  # secret and pulled from vault like the secret key
+                  accessKeyID: AKIAR3Z7ELN7VLNNHZHZ
+                  region: us-east-1
+                  secretAccessKeySecretRef:
+                    key: secret-access-key
+                    name: route53-key
+              selector:
+                dnsZones:
+                  - signal9.gg
+                  - lab.signal9.gg
