@@ -1,0 +1,12 @@
+{{- if .Values.certManager.enabled -}}
+apiVersion: operators.coreos.com/v1alpha2
+kind: OperatorGroup
+metadata:
+  name: openshift-cert-manager-operator
+  namespace: openshift-cert-manager-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+spec:
+  targetNamespaces:
+    - openshift-cert-manager-operator
+{{ end }}
