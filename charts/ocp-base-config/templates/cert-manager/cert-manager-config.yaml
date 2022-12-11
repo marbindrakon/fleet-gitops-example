@@ -1,0 +1,19 @@
+{{- if .Values.certManager.enabled -}}
+apiVersion: operator.openshift.io/v1alpha1
+kind: CertManager
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  managementState: "Managed"
+  unsupportedConfigOverrides:
+    controller:
+      args:
+        - '--v=2'
+        - '--cluster-resource-namespace=$(POD_NAMESPACE)'
+        - '--leader-election-namespace=kube-system'
+        - '--dns01-recursive-nameservers=8.8.8.8:53'
+        - '--dns01-recursive-nameservers-only'
+{{ end }}

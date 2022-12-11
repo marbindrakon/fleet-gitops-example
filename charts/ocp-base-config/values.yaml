@@ -12,21 +12,24 @@ certManager:
   enabled: true
   apiCert: true
   defaultIngressCert: true
-  acmeBase: 'https://acme-ca.lab.signal9.gg:8443/acme/directory'
+  acmeBase: 'https://acme-v02.api.letsencrypt.org/directory'
   externalSecret:
-    name: ipa-tsig
-    vaultName: ipa-tsig
+    name: route53-key
+    vaultName: signal9-route53
   solvers:
     - http01:
         ingress: {}
     - dns01:
-        rfc2136:
-          nameserver: xna-ipa-1.home.signal9.gg
-          tsigKeyName: cert-manager
-          tsigAlgorithm: HMACSHA256
-          tsigSecretSecretRef:
-            name: ipa-tsig
-            key: key
+        route53:
+          accessKeyID: REDACTED
+          region: us-east-1
+          secretAccessKeySecretRef:
+            key: secret-access-key
+            name: route53-key
+      selector:
+        dnsZones:
+          - signal9.gg
+          - lab.signal9.gg
 
 monitoring:
   enabled: true
