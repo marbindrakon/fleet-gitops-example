@@ -10,7 +10,7 @@ spec:
   acme:
     email: admin@signal9.gg
     privateKeySecretRef:
-      name: {{ .Values.certManager.externalSecret.name }}
+      name: acme-private-key
     server: {{ .Values.certManager.acmeBase }}
     solvers:
 {{ toYaml .Values.certManager.solvers | indent 6 }}
