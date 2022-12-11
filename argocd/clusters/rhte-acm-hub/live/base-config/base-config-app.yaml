@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
     path: "charts/ocp-base-config"
-    targetRevision: master
+    targetRevision: HEAD
     helm:
       values: |
         cluster:
