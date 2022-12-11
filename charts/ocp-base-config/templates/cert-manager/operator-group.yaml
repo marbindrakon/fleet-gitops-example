@@ -6,7 +6,5 @@ metadata:
   namespace: openshift-cert-manager-operator
   annotations:
     argocd.argoproj.io/sync-wave: '-1'
-spec:
-  targetNamespaces:
-    - openshift-cert-manager-operator
+spec: {}
 {{ end }}
