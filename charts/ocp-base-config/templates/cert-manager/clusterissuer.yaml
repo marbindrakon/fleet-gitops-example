@@ -9,6 +9,7 @@ metadata:
 spec:
   acme:
     email: admin@signal9.gg
+    skipTLSVerify: true
     privateKeySecretRef:
       name: acme-private-key
     server: {{ .Values.certManager.acmeBase }}
