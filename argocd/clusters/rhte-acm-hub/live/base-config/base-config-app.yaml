@@ -19,5 +19,7 @@ spec:
         cluster:
           name: rhte-acm-hub
           baseDomain: lab.signal9.gg
+        monitoring:
+          enabled: false
         externalSecrets:
           vaultAuthPath: 'k8s-rhte-acm-hub'
