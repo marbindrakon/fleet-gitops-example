@@ -15,8 +15,8 @@ spec:
     organizations:
     - "Signal9 Labs"
   privateKey:
-    size: 256
-    algorithm: ECDSA
+    size: 4096
+    algorithm: RSA
     encoding: PKCS1
     rotationPolicy: Always
   usages:
