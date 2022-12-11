@@ -5,6 +5,7 @@ metadata:
   name: external-secrets-operator
   namespace: external-secrets-operator
   annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: '0'
 spec:
   # this must be set to false when using olm

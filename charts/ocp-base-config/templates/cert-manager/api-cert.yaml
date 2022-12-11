@@ -5,6 +5,7 @@ metadata:
   name: api-certificate
   namespace: openshift-config
   annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: "2"
 spec:
   secretName: acme-api
