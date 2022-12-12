@@ -1,0 +1,139 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-managed-gitops
+  namespace: rhacm-hub
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+spec:
+  remediationAction: enforce
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-managed-argocd-subscription
+        spec:
+          remediationAction: enforce
+          severity: low
+          namespaceSelector:
+            exclude:
+              - kube-*
+            include:
+              - default
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: operators.coreos.com/v1alpha1
+                kind: Subscription
+                metadata:
+                  name: openshift-gitops-operator
+                  namespace: openshift-operators
+                spec:
+                  channel: gitops-1.6
+                  installPlanApproval: Automatic
+                  name: openshift-gitops-operator
+                  source: redhat-operators
+                  sourceNamespace: openshift-marketplace
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-managed-argocd-clusterrolebinding
+        spec:
+          remediationAction: enforce
+          severity: low
+          namespaceSelector:
+            exclude:
+              - kube-*
+            include:
+              - default
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                kind: ClusterRoleBinding
+                apiVersion: rbac.authorization.k8s.io/v1
+                metadata:
+                  name: gitops-cluster-admin
+                subjects:
+                  - kind: ServiceAccount
+                    name: openshift-gitops-argocd-application-controller
+                    namespace: openshift-gitops
+                roleRef:
+                  apiGroup: rbac.authorization.k8s.io
+                  kind: ClusterRole
+                  name: cluster-admin
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-cluster-configs-appset
+        spec:
+          remediationAction: enforce
+          severity: low
+          namespaceSelector:
+            exclude:
+              - kube-*
+            include:
+              - openshift-gitops
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: argoproj.io/v1alpha1
+                kind: ApplicationSet
+                metadata:
+                  name: cluster-configs
+                  naemspace: openshift-gitops
+                spec:
+                  generators:
+                  - git:
+                      repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+                      revision: HEAD
+                      directories:
+                      - path: argocd/clusters/managed-clusters/{{hub .ManagedClusterName hub}}/live/*
+                  template:
+                    metadata:
+                      name: '{{ "{{ path.basename }}" }}'
+                    spec:
+                      project: default
+                      syncPolicy:
+                        automated: {}
+                      destination:
+                        namespace: openshift-gitops
+                        server: "https://kubernetes.default.svc"
+                      source:
+                        repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+                        targetRevision: HEAD
+                        path: '{{ "{{ path }}" }}'
+
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-policy-managed-gitops
+  namespace: rhacm-hub
+placementRef:
+  name: placement-policy-managed-gitops
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+  - name: policy-managed-gitops
+    kind: Policy
+    apiGroup: policy.open-cluster-management.io
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-policy-managed-gitops
+  namespace: rhacm-hub
+spec:
+  clusterConditions:
+    - status: "True"
+      type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+      - { key: spoke-gitops, operator: In, values: ["true"] }
