@@ -7,6 +7,11 @@ spec:
   destination:
     namespace: openshift-gitops
     server: "https://kubernetes.default.svc"
+  ignoreDifferences:
+    - group: hive.openshift.io
+      kind: ClusterDeployment
+      jsonPointers:
+        - /spec/installed
   project: default
   syncPolicy:
     automated: {}
