@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: cluster-configs
+  name: managed-cluster-configs
   namespace: openshift-gitops
 spec:
   generators:
@@ -12,7 +12,7 @@ spec:
       - path: argocd/clusters/managed-clusters/*
   template:
     metadata:
-      name: "{{ path.basename }}"
+      name: "{{ path.basename }}"-managed
     spec:
       project: default
       syncPolicy:
