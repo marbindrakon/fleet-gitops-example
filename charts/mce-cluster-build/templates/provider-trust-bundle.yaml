@@ -9,5 +9,5 @@ metadata:
     argocd.argoproj.io/sync-wave: '0'
 stringData:
   ca.crt: |
-{{ .Values.provider.providerCAs | indent(4) }}
+{{ indent 4 .Values.provider.providerCAs }}
 {{ end }}

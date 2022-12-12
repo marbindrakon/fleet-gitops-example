@@ -16,7 +16,7 @@ spec:
   installAttemptsLimit: 3
   installed: false
   platform:
-{{- if eq .Values.provider.type "OpenStack" -}}
+{{ if eq .Values.provider.type "OpenStack" }}
     openstack:
       certificatesSecretRef:
         name: {{ .Values.cluster.name }}-trust
