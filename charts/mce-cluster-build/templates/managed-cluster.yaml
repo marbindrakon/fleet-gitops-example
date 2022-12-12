@@ -9,6 +9,7 @@ metadata:
     vendor: OpenShift
   name: {{ .Values.cluster.name }}
   annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-wave: '1'
 spec:
   hubAcceptsClient: true
