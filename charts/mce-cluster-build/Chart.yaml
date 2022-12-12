@@ -1,0 +1,9 @@
+apiVersion: v2
+name: mce-cluster-build
+description: Helm chart for generating cluster build manifests
+
+type: application
+
+version: 0.0.1
+
+appVersion: "4.11"

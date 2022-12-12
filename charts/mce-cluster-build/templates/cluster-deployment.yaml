@@ -1,0 +1,35 @@
+apiVersion: hive.openshift.io/v1
+kind: ClusterDeployment
+metadata:
+  name: {{ .Values.cluster.name }}
+  namespace: {{ .Values.cluster.name }}
+  labels:
+    cloud: {{ .Values.provider.type }}
+    vendor: 'OpenShift'
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  baseDomain: {{ .Values.cluster.baseDomain }}
+  clusterName: {{ .Values.cluster.name }}
+  controlPlaneConfig:
+    servingCertificates: {}
+  installAttemptsLimit: 3
+  installed: false
+  platform:
+{{- if eq .Values.provider.type "OpenStack" -}}
+    openstack:
+      certificatesSecretRef:
+        name: {{ .Values.cluster.name }}-trust
+      credentialsSecretRef:
+        name: {{ .Values.cluster.name }}-provider-creds
+      cloud: openstack
+{{ end }}
+  provisioning:
+    installConfigSecretRef:
+      name: {{ .Values.cluster.name }}-install-config
+    sshPrivateKeySecretRef:
+      name: {{ .Values.cluster.name }}-ssh-key
+    imageSetRef:
+      name: {{ .Values.cluster.clusteImageSet }}
+  pullSecretRef:
+    name: {{ .Values.cluster.name }}-pull-secret

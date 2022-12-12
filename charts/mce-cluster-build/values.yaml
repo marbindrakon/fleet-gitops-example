@@ -1,0 +1,23 @@
+cluster:
+  name: ocp4
+  baseDomain: lab.signal9.gg
+  controlPlaneCount: 3
+  workerCount: 3
+  apiVIP: ""
+  ingressVIP: ""
+  pullSecretVault: ""
+  trustedCAs: ""
+  sshKeyVault: ""
+  sshPubKey: ""
+  dnsServers: []
+
+provider:
+  providerCredsVault: ""
+  providerCAs: ""
+  type: OpenStack
+  openstack:
+    existingImage: null
+    externalNetwork: ""
+    computeAZs: []
+    controlPlaneFlavor: m1.xlarge
+    workerFlavor: m1.large
