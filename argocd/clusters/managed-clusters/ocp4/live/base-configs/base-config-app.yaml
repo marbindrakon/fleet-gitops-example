@@ -6,7 +6,7 @@ metadata:
 spec:
   destination:
     namespace: openshift-gitops
-    server: "ocp4"
+    server: "https://kubernetes.default.svc"
   project: default
   syncPolicy:
     automated: {}
