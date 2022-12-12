@@ -15,4 +15,4 @@ spec:
     creationPolicy: Owner
   dataFrom:
     - extract:
-        key: {{ .Values.sshKeyVault }}
+        key: {{ .Values.cluster.sshKeyVault }}
