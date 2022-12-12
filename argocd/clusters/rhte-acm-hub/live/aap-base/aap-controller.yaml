@@ -1,0 +1,30 @@
+---
+apiVersion: automationcontroller.ansible.com/v1beta1
+kind: AutomationController
+metadata:
+  name: acm-hub-aap
+  namespace: aap
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  create_preload_data: false
+  route_tls_termination_mechanism: Edge
+  ingress_type: route
+  service_type: ClusterIP
+  garbage_collect_secrets: false
+  image_pull_policy: IfNotPresent
+  projects_storage_size: 12Gi
+  task_privileged: false
+  projects_storage_access_mode: ReadWriteMany
+  projects_persistence: true
+  projects_use_existing_claim: _No_
+  projects_storage_class: ocs-external-storagecluster-cephfs
+  replicas: 1
+  admin_user: admin
+  admin_email: admin@signal9.gg
+  admin_password_secret: aap-admin-password
+  secret_key_secret: aap-secret-key
+  bundle_cacert_secret: app-ca-trust
+  route_host: aap.apps.rhte-acm-hub.lab.signal9.gg
+  hostname: aap.apps.rhte-acm-hub.lab.signal9.gg
