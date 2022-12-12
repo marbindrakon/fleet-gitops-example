@@ -1,0 +1,10 @@
+apiVersion: hive.openshift.io/v1
+kind: HiveConfig
+metadata:
+  name: hive
+  annotations:
+    argocd.argoproj.io/sync-wave: '3'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  additionalCertificateAuthoritiesSecretRef:
+    name: signal9-ca-bundle
