@@ -87,7 +87,7 @@ spec:
                 kind: ApplicationSet
                 metadata:
                   name: cluster-configs
-                  naemspace: openshift-gitops
+                  namespace: openshift-gitops
                 spec:
                   generators:
                   - git:
