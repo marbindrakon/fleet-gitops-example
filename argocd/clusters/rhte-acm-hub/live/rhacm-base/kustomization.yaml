@@ -7,6 +7,7 @@ resources:
   - mco-namespace.yaml
   - mco-pull-secret.yaml
   - mco-obc.yaml
+  - gitops-integration.yaml
   # These must be re-enabled after adding the s3 bucket credentials to vault
   - thanos-secret.yaml
   - mco.yaml
