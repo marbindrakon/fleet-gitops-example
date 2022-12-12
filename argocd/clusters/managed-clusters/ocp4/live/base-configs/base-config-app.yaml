@@ -10,6 +10,10 @@ spec:
   project: default
   syncPolicy:
     automated: {}
+    retry:
+      backoff:
+        maxDuration: 1m
+      limit: -1
   source:
     repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
     path: "charts/ocp-base-config"
