@@ -110,7 +110,7 @@ spec:
             -----END CERTIFICATE-----
           type: OpenStack
           openstack:
-            existingImage: null
+            existingImage: "rhcos-4.11.9"
             externalNetwork: "lab-net"
             computeAZs:
               - az1
