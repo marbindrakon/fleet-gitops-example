@@ -29,7 +29,12 @@ spec:
       name: {{ .Values.cluster.name }}-install-config
     sshPrivateKeySecretRef:
       name: {{ .Values.cluster.name }}-ssh-key
+{{ if .Values.cluster.clusterImageSet }}
     imageSetRef:
       name: {{ .Values.cluster.clusterImageSet }}
+{{ end }}
+{{ if .Values.cluster.releaseImage }}
+    releaseImage: {{ .Values.cluster.releaseImage }}
+{{ end }}
   pullSecretRef:
     name: {{ .Values.cluster.name }}-pull-secret
