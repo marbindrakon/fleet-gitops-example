@@ -25,7 +25,7 @@ spec:
           useACM: true
           name: ocp
           baseDomain: lab.signal9.gg
-          clusterImageSet: img4.10.43-x86-64-appsub
+          releaseImage: quay.io/okd/scos-release@sha256:3cdff7c4770488ca162b0099528ac6ab62c046d6c4a1d872ef30c0dd5bc9fcf6
           controlPlaneCount: 3
           workerCount: 3
           apiVIP: "172.18.104.223"
@@ -109,7 +109,7 @@ spec:
             -----END CERTIFICATE-----
           type: OpenStack
           openstack:
-            existingImage: rhcos-4.10-browbeat
+            existingImage: null
             externalNetwork: "lab-net"
             computeAZs:
               - az1
