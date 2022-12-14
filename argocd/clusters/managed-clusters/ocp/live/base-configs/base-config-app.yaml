@@ -24,7 +24,7 @@ spec:
           name: ocp
           baseDomain: lab.signal9.gg
         monitoring:
-          enabled: true
+          enabled: false
         externalSecrets:
           vaultAuthPath: 'k8s-ocp'
         auth:
