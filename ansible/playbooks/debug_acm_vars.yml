@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: localhost
   gather_facts: true
   tasks:
     - name: debug cluster_deployment
