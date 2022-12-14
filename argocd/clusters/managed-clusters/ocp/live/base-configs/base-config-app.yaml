@@ -27,6 +27,13 @@ spec:
           enabled: true
         externalSecrets:
           vaultAuthPath: 'k8s-ocp'
+        auth:
+          oidcDisplayName: Test-OIDC
+          oidcClientID: openshift-test
+          oidcIssuer: https://keycloak-sso-test.apps.atlas.lab.signal9.gg/auth/realms/testrealm
+          externalSecret:
+            name: oauth-test-client-secret
+            vaultName: test-openid-secret
         certManager:
           solvers:
             - http01:

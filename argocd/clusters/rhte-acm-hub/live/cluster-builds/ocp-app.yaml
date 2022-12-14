@@ -25,8 +25,6 @@ spec:
           useACM: true
           name: ocp
           baseDomain: lab.signal9.gg
-          releaseImage: quay.io/okd/scos-release@sha256:3cdff7c4770488ca162b0099528ac6ab62c046d6c4a1d872ef30c0dd5bc9fcf6
-          clusterImageSet: null
           controlPlaneCount: 3
           workerCount: 3
           apiVIP: "172.18.104.223"
@@ -116,5 +114,5 @@ spec:
               - az1
               - az2
               - az3
-            controlPlaneFlavor: m1.xlarge
+            controlPlaneFlavor: m1.2xlarge
             workerFlavor: m1.large
