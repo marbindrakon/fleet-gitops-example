@@ -21,3 +21,11 @@ spec:
   name: ansible-automation-platform-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
+  config:
+    env:
+      - name: RELATED_IMAGE_CONTROL_PLANE_EE
+        value: registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8@sha256:c1012c02b5e6a2d6130a2a903bed6290eacd25cf6aeb1cb68395a29f911d0b6f
+      - name: RELATED_IMAGE_EE_SUPPORTED
+        value: registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8@sha256:c1012c02b5e6a2d6130a2a903bed6290eacd25cf6aeb1cb68395a29f911d0b6f
+      - name: RELATED_IMAGE_EE_MINIMAL
+        value: registry.redhat.io/ansible-automation-platform-23/ee-minimal-rhel8@sha256:5c520b468f7f423059363e4397927c2ace498bcdc658340619159fdaf0d4fc01
