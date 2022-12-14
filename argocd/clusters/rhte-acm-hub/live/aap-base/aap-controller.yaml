@@ -28,3 +28,12 @@ spec:
   bundle_cacert_secret: app-ca-trust
   route_host: aap.apps.rhte-acm-hub.lab.signal9.gg
   hostname: aap.apps.rhte-acm-hub.lab.signal9.gg
+  # Customize EE images due to pull error
+  control_plane_ee_image: registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8@sha256:c1012c02b5e6a2d6130a2a903bed6290eacd25cf6aeb1cb68395a29f911d0b6f
+  ee_images:
+    - name: supported-ee
+      image: registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8@sha256:c1012c02b5e6a2d6130a2a903bed6290eacd25cf6aeb1cb68395a29f911d0b6f
+    - name: supported-minimal
+      image: registry.redhat.io/ansible-automation-platform-23/ee-minimal-rhel8@sha256:5c520b468f7f423059363e4397927c2ace498bcdc658340619159fdaf0d4fc01
+    - name: supported-2.9
+      image: registry.redhat.io/ansible-automation-platform-23/ee-29-rhel8@sha256:3414db39974a6ae20dd7947f18ab9072d69d9d6877aa4d0e0c0bd3e1ada295a7
