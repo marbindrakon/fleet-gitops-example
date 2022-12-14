@@ -1,0 +1,10 @@
+- hosts: all
+  gather_facts: true
+  tasks:
+    - name: debug cluster_deployment
+      ansible.builtin.debug:
+        var: cluster_deployment
+
+    - name: debug install_config
+      ansible.builtin.debug:
+        var: install_config
