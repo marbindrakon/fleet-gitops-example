@@ -27,6 +27,12 @@ spec:
           enabled: false
         externalSecrets:
           vaultAuthPath: 'k8s-ocp2'
+        timesync:
+          enabled: true
+          ptp:
+            enabled: true
+            loadKvmModule: true
+          ntpServers: []
         certManager:
           solvers:
             - http01:
