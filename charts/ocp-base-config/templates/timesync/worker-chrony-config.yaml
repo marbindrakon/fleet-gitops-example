@@ -1,0 +1,26 @@
+{{- if .Values.timesync.enabled -}}
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 99-worker-chrony-conf-override
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    storage:
+      files:
+{{ if .Values.timesync.ptp.loadKvmModule }}
+        - contents:
+            source: data:text/plain;charset=utf-8;base64,{{ include "ocp-base-config.ptpKvmModprobe" . | b64enc }}
+          mode: 420
+          overwrite: true
+          path: /etc/modules-load.d/ptp_kvm.conf
+{{ end }}
+        - contents:
+            source: data:text/plain;charset=utf-8;base64,{{ include "ocp-base-config.chronyConfigData" . | b64enc }}
+          mode: 420
+          overwrite: true
+          path: /etc/chrony.conf
+{{- end -}}

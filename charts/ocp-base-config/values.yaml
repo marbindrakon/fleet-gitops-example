@@ -43,3 +43,15 @@ auth:
   externalSecret:
     name: oauth-signal9-client-secret
     vaultName: signal9-openid
+
+timesync:
+  enabled: true
+  ptp:
+    enabled: false
+    loadKvmModule: false
+    device: 'ptp0'
+    sourceStratum: 2
+  ntpServers:
+    - 172.18.0.79
+    - 172.18.42.10
+    - 172.18.42.11
