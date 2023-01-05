@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ocp-deploy
+  name: ocp2-deploy
   namespace: openshift-gitops
 spec:
   destination:
@@ -23,13 +23,13 @@ spec:
       values: |
         cluster:
           useACM: true
-          releaseImage: registry.ci.openshift.org/origin/release:4.12.0-0.okd-2022-12-22-033745
-          name: ocp
+          name: ocp2
           baseDomain: lab.signal9.gg
+          clusterImageSet: img4.11.17-x86-64-appsub
           controlPlaneCount: 3
           workerCount: 3
-          apiVIP: "172.18.104.223"
-          ingressVIP: "172.18.104.197"
+          apiVIP: "172.18.104.114"
+          ingressVIP: "172.18.104.232"
           pullSecretVault: "ocp-pull-secret"
           trustedCAs: |
             -----BEGIN CERTIFICATE-----
@@ -53,10 +53,7 @@ spec:
           dnsServers:
             - 172.18.42.10
             - 172.18.42.11
-        monitoring:
-          enabled: false
-          storageClass: standard
-
+        
         provider:
           providerCredsVault: "opensnack-cloud-config"
           providerCAs: |
@@ -109,11 +106,11 @@ spec:
             -----END CERTIFICATE-----
           type: OpenStack
           openstack:
-            existingImage: null
+            existingImage: rhcos-4.11.9
             externalNetwork: "lab-net"
             computeAZs:
               - az1
               - az2
               - az3
-            controlPlaneFlavor: m1.2xlarge
+            controlPlaneFlavor: m1.xlarge
             workerFlavor: m1.large
