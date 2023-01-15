@@ -35,7 +35,7 @@ data:
             name: hub-alertmanager-router-ca
           insecureSkipVerify: false
       externalLabels:
-        cluster: dd6f0eb2-437a-48fe-9ba0-4e85ff61d0dc
+        cluster: 2752f03d-ff94-4931-af6b-c98a27d97cd8
       logLevel: ""
       nodeSelector: null
       remoteWrite: null
