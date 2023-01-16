@@ -1,0 +1,43 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    alertmanagerMain:
+      nodeSelector: null
+      resources: null
+      tolerations: null
+      volumeClaimTemplate:
+        metadata: {}
+        spec:
+          resources:
+            requests:
+              storage: 5Gi
+          storageClassName: ocs-external-storagecluster-ceph-rbd
+        status: {}
+    enableUserWorkload: null
+    grafana: null
+    http: null
+    k8sPrometheusAdapter: null
+    kubeStateMetrics: null
+    openshiftStateMetrics: null
+    prometheusK8s:
+      logLevel: ""
+      nodeSelector: null
+      remoteWrite: null
+      resources: null
+      retention: 7d
+      tolerations: null
+      volumeClaimTemplate:
+        metadata: {}
+        spec:
+          resources:
+            requests:
+              storage: 50Gi
+          storageClassName: ocs-external-storagecluster-ceph-rbd
+        status: {}
+    prometheusOperator: null
+    telemeterClient: null
+    thanosQuerier: null
