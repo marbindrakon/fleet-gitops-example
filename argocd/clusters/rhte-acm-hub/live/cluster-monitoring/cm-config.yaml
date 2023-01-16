@@ -6,12 +6,17 @@ metadata:
 data:
   config.yaml: |
     alertmanagerMain:
+      nodeSelector: null
+      resources: null
+      tolerations: null
       volumeClaimTemplate:
-       spec:
-         storageClassName: ocs-external-storagecluster-ceph-rbd
-         resources:
-           requests:
-             storage: 5Gi
+        metadata: {}
+        spec:
+          resources:
+            requests:
+              storage: 5Gi
+          storageClassName: ocs-external-storagecluster-ceph-rbd
+        status: {}
     enableUserWorkload: null
     grafana: null
     http: null
@@ -36,18 +41,21 @@ data:
           insecureSkipVerify: false
       externalLabels:
         cluster: 2752f03d-ff94-4931-af6b-c98a27d97cd8
+        managed_cluster: 2752f03d-ff94-4931-af6b-c98a27d97cd8
       logLevel: ""
       nodeSelector: null
       remoteWrite: null
       resources: null
-      retention: "7d"
+      retention: 7d
       tolerations: null
       volumeClaimTemplate:
-       spec:
-         storageClassName: ocs-external-storagecluster-ceph-rbd
-         resources:
-           requests:
-             storage: 50Gi
+        metadata: {}
+        spec:
+          resources:
+            requests:
+              storage: 50Gi
+          storageClassName: ocs-external-storagecluster-ceph-rbd
+        status: {}
     prometheusOperator: null
     telemeterClient: null
     thanosQuerier: null
