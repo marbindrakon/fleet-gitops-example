@@ -26,6 +26,8 @@ spec:
         odfStorage:
           enabled: true
           external: true
+        network:
+          hostRouting: true
         certManager:
           solvers:
             - http01:
