@@ -18,6 +18,8 @@ spec:
         preferredUsername:
         - preferred_username
         - email
+        groups:
+        - groups
       clientID: {{ .Values.auth.oidcClientID }}
       clientSecret:
         name: {{ .Values.auth.externalSecret.name }}
