@@ -1,0 +1,12 @@
+{{- if and .Values.odfStorage.enabled .Values.odfStorage.external -}}
+apiVersion: ocs.openshift.io/v1
+kind: StorageCluster
+metadata:
+  name: ocs-external-storagecluster
+  namespace: openshift-storage
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
+spec:
+  externalStorage:
+    enable: true
+{{- end -}}

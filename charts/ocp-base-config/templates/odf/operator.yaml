@@ -1,0 +1,52 @@
+{{- if .Values.odfStorage.enabled -}}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+  labels:
+    openshift.io/cluster-monitoring: "true"
+  name: openshift-storage
+spec: {}
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-storage-operatorgroup
+  namespace: openshift-storage
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  targetNamespaces:
+  - openshift-storage
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: odf-operator
+  namespace: openshift-storage
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  channel: "stable-{{ .Values.odfStorage.version }}"
+  installPlanApproval: Automatic
+  name: odf-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+---
+apiVersion: console.openshift.io/v1alpha1
+kind: ConsolePlugin
+metadata:
+  name: odf-console
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  displayName: ODF Plugin
+  service:
+    basePath: /
+    name: odf-console-service
+    namespace: openshift-storage
+    port: 9001
+---
+{{- end -}}

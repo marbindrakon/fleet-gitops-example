@@ -35,6 +35,17 @@ monitoring:
   enabled: true
   storageClass: standard
 
+network:
+  hostRouting: false
+
+odfStorage:
+  enabled: false
+  version: '4.11'
+  external: false
+  externalSecret:
+    name: rook-ceph-external-cluster-details
+    vaultName: rhte-acm-hub-rook-data
+
 auth:
   enabled: true
   oidcDisplayName: Signal9-RHT
