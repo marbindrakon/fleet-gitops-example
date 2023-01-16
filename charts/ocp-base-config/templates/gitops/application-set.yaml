@@ -8,12 +8,12 @@ metadata:
 spec:
   generators:
     - git:
-      repoURL: "{{ .Values.cluster.gitOpsRepo }}"
-      revision: HEAD
-      directories:
-      - path: "{{ .Values.cluster.gitOpsBasePath }}/{{ .Values.cluster.name }}/live/*"
-      - path: "{{ .Values.cluster.gitOpsBasePath }}/{{ .Values.cluster.name }}/live/base-config"
-        exclude: true
+        repoURL: "{{ .Values.cluster.gitOpsRepo }}"
+        revision: HEAD
+        directories:
+        - path: "{{ .Values.cluster.gitOpsBasePath }}/{{ .Values.cluster.name }}/live/*"
+        - path: "{{ .Values.cluster.gitOpsBasePath }}/{{ .Values.cluster.name }}/live/base-config"
+          exclude: true
   template:
     metadata:
       name: '{{ "{{ path.basename }}" }}'
