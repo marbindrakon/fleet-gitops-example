@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-configs
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '10'
+spec:
+  generators:
+    - git:
+      repoURL: "{{ .Values.cluster.gitOpsRepo }}"
+      revision: HEAD
+      directories:
+      - path: "{{ .Values.cluster.gitOpsBasePath }}/{{ .Values.cluster.name }}/live/*"
+  template:
+    metadata:
+      name: '{{ "{{ path.basename }}" }}'
+    spec:
+      project: default
+      syncPolicy:
+        automated: {}
+      destination:
+        namespace: openshift-gitops
+        server: "https://kubernetes.default.svc"
+      source:
+        repoURL: "{{ .Values.cluster.gitOpsRepo }}"
+        targetRevision: HEAD
+        path: '{{ "{{ path }}" }}'

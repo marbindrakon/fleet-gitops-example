@@ -1,6 +1,8 @@
 cluster:
   name: rhte-acm-hub
   baseDomain: lab.signal9.gg
+  gitOpsRepo: https://github.com/marbindrakon/rhte-2023-fleet-gitops.git
+  gitOpsBasePath: argocd/clusters
 
 externalSecrets:
   enabled: true
