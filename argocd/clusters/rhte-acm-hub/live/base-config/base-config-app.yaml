@@ -23,6 +23,9 @@ spec:
           enabled: false
         externalSecrets:
           vaultAuthPath: 'k8s-rhte-acm-hub'
+        odfStorage:
+          enabled: true
+          external: true
         certManager:
           solvers:
             - http01:
