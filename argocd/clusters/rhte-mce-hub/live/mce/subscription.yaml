@@ -1,0 +1,26 @@
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: mce-hub-group
+  namespace: multicluster-engine
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  targetNamespaces:
+  - multicluster-engine
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: multicluster-engine
+  namespace: multicluster-engine
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  sourceNamespace: openshift-marketplace
+  source: redhat-operators
+  channel: stable-2.1
+  installPlanApproval: Automatic
+  name: multicluster-engine
+
