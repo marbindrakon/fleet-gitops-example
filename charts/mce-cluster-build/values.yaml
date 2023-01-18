@@ -1,6 +1,8 @@
 cluster:
   name: ocp4
   baseDomain: lab.signal9.gg
+  importToHub: true
+  useACM: false
   clusterImageSet: img4.11.17-x86-64-appsub
   releaseImage: null
   controlPlaneCount: 3

@@ -1,5 +1,4 @@
-{{- if .Values.cluster.useACM -}}
----
+{{- if .Values.cluster.importToHub - }}
 apiVersion: cluster.open-cluster-management.io/v1
 kind: ManagedCluster
 metadata:
@@ -14,28 +13,4 @@ metadata:
     argocd.argoproj.io/sync-wave: '1'
 spec:
   hubAcceptsClient: true
----
-apiVersion: agent.open-cluster-management.io/v1
-kind: KlusterletAddonConfig
-metadata:
-  name: {{ .Values.cluster.name }}
-  namespace: {{ .Values.cluster.name }}
-  annotations:
-    argocd.argoproj.io/sync-wave: '1'
-spec:
-  clusterName: {{ .Values.cluster.name }}
-  clusterNamespace: {{ .Values.cluster.name }}
-  clusterLabels:
-    cloud: {{ .Values.provider.type }}
-    vendor: OpenShift
-  applicationManager:
-    enabled: true
-  policyController:
-    enabled: true
-  searchCollector:
-    enabled: true
-  certPolicyController:
-    enabled: true
-  iamPolicyController:
-    enabled: true
 {{ end }}
