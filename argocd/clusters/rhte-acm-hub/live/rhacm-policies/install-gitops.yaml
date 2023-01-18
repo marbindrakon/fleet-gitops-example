@@ -86,7 +86,7 @@ spec:
                 apiVersion: argoproj.io/v1alpha1
                 kind: ApplicationSet
                 metadata:
-                  name: cluster-configs
+                  name: cluster-base-configs
                   namespace: openshift-gitops
                 spec:
                   generators:
