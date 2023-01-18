@@ -23,10 +23,18 @@ spec:
         cluster:
           name: ocp4
           baseDomain: lab.signal9.gg
+          gitOpsBasePath: argocd/clusters/managed-clusters
         monitoring:
-          enabled: false
+          enabled: true
+          storageClass: standard-csi
         externalSecrets:
           vaultAuthPath: 'k8s-ocp4'
+        timesync:
+          enabled: true
+          ptp:
+            enabled: true
+            loadKvmModule: true
+          ntpServers: []
         certManager:
           solvers:
             - http01:
