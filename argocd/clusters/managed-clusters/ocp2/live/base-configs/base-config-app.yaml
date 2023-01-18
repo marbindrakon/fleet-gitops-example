@@ -23,8 +23,10 @@ spec:
         cluster:
           name: ocp2
           baseDomain: lab.signal9.gg
+          gitOpsBasePath: argocd/clusters/managed-clusters
         monitoring:
-          enabled: false
+          enabled: true
+          storageClass: standard-csi
         externalSecrets:
           vaultAuthPath: 'k8s-ocp2'
         timesync:
