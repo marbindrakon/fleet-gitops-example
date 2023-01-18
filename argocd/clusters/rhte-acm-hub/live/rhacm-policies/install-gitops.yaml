@@ -67,6 +67,48 @@ spec:
                   apiGroup: rbac.authorization.k8s.io
                   kind: ClusterRole
                   name: cluster-admin
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-cluster-configs-appset
+        spec:
+          remediationAction: enforce
+          severity: low
+          namespaceSelector:
+            exclude:
+              - kube-*
+            include:
+              - openshift-gitops
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: argoproj.io/v1alpha1
+                kind: ApplicationSet
+                metadata:
+                  name: cluster-configs
+                  namespace: openshift-gitops
+                spec:
+                  generators:
+                  - git:
+                      repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+                      revision: HEAD
+                      directories:
+                      - path: argocd/clusters/managed-clusters/{{hub .ManagedClusterName hub}}/live/base-configs
+                  template:
+                    metadata:
+                      name: '{{ "{{ path.basename }}" }}'
+                    spec:
+                      project: default
+                      syncPolicy:
+                        automated: {}
+                      destination:
+                        namespace: openshift-gitops
+                        server: "https://kubernetes.default.svc"
+                      source:
+                        repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+                        targetRevision: HEAD
+                        path: '{{ "{{ path }}" }}'
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
