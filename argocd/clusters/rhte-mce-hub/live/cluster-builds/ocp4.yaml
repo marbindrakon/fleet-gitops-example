@@ -24,6 +24,7 @@ spec:
         cluster:
           useACM: false
           importToHub: true
+          createGitopsManifestWorks: true
           name: ocp4
           baseDomain: lab.signal9.gg
           clusterImageSet: img4.12.0-x86-64-appsub
