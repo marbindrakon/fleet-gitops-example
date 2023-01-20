@@ -1,0 +1,59 @@
+{{- if .Values.cluster.createGitopsManifestWorks -}}
+apiVersion: work.open-cluster-management.io/v1
+kind: ManifestWork
+metadata:
+  namespace: {{ .Values.cluster.name }}
+  name: gitops-onboarding
+spec:
+  workload:
+    manifests:
+      -  apiVersion: operators.coreos.com/v1alpha1
+         kind: Subscription
+         metadata:
+           name: openshift-gitops-operator
+           namespace: openshift-operators
+         spec:
+           channel: gitops-1.7
+           installPlanApproval: Automatic
+           name: openshift-gitops-operator
+           source: redhat-operators
+           sourceNamespace: openshift-marketplace
+      - kind: ClusterRoleBinding
+        apiVersion: rbac.authorization.k8s.io/v1
+        metadata:
+          name: gitops-cluster-admin
+        subjects:
+          - kind: ServiceAccount
+            name: openshift-gitops-argocd-application-controller
+            namespace: openshift-gitops
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: cluster-admin
+      - apiVersion: argoproj.io/v1alpha1
+        kind: ApplicationSet
+        metadata:
+          name: cluster-base-configs
+          namespace: openshift-gitops
+        spec:
+          generators:
+          - git:
+              repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+              revision: HEAD
+              directories:
+              - path: argocd/clusters/managed-clusters/{{ .Values.cluster.name }}/live/base-configs
+          template:
+            metadata:
+              name: '{{ "{{ path.basename }}" }}'
+            spec:
+              project: default
+              syncPolicy:
+                automated: {}
+              destination:
+                namespace: openshift-gitops
+                server: "https://kubernetes.default.svc"
+              source:
+                repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+                targetRevision: HEAD
+                path: '{{ "{{ path }}" }}'
+{{ end }}
