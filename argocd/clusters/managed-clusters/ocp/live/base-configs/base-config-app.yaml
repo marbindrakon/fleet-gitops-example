@@ -23,17 +23,21 @@ spec:
         cluster:
           name: ocp
           baseDomain: lab.signal9.gg
+          gitOpsBasePath: argocd/clusters/managed-clusters
         monitoring:
-          enabled: false
+          enabled: true
+          storageClass: standard-csi
         externalSecrets:
           vaultAuthPath: 'k8s-ocp'
-        auth:
-          oidcDisplayName: Test-OIDC
-          oidcClientID: openshift-test
-          oidcIssuer: https://keycloak-sso-test.apps.atlas.lab.signal9.gg/auth/realms/testrealm
-          externalSecret:
-            name: oauth-test-client-secret
-            vaultName: test-openid-secret
+        timesync:
+          enabled: true
+          ptp:
+            enabled: false
+            loadKvmModule: false
+          ntpServers:
+            - 172.18.0.79
+            - 172.18.42.10
+            - 172.18.42.11
         certManager:
           solvers:
             - http01:
