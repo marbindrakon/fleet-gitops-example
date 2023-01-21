@@ -20,7 +20,9 @@ spec:
     spec:
       project: default
       syncPolicy:
-        automated: {}
+        automated:
+          prune: true
+          allowEmpty: true
       destination:
         namespace: openshift-gitops
         server: "https://kubernetes.default.svc"
