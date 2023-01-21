@@ -3,6 +3,7 @@ kind: Provisioning
 metadata:
   name: provisioning-configuration
 spec:
-  provisioningInterface: bond0
+  provisioningMacAddresses:
+    - ac:1f:6b:79:e3:da
   provisioningNetwork: Disabled
   watchAllNamespaces: true
