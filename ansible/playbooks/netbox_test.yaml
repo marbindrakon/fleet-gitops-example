@@ -1,0 +1,29 @@
+- hosts: localhost
+  gather_facts: true
+  tasks:
+  - name: Obtain list of devices from NetBox
+    set_fact: 
+      device_list: "{{ query('netbox.netbox.nb_lookup', 'devices',
+                    api_filter='status=staged') }}"
+  - name: Get interfaces for device
+    set_fact:
+      "dev_{{ item.key }}_interfaces": "{{ query('netbox.netbox.nb_lookup', 'interfaces', api_filter='device=' + item.value.name) }}"
+    loop: "{{ device_list }}"
+
+  - name: Assign bond0 IP
+    netbox.netbox.netbox_ip_address:
+      state: present
+      data:
+        prefix: 172.18.16.0/24
+        assigned_object:
+          name: bond0
+          device: SL230-NODE-1
+
+  - name: Assign bond1.19 IP
+    netbox.netbox.netbox_ip_address:
+      state: present
+      data:
+        prefix: 172.18.19.0/24
+        assigned_object:
+          name: bond1.19
+          device: SL230-NODE-1
