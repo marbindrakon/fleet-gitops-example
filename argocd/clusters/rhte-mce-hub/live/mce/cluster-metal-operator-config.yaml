@@ -5,7 +5,5 @@ metadata:
 spec:
   provisioningMacAddresses:
     - ac:1f:6b:79:e3:da
-  provisioningInterface: bond0
-  provisioningIP: 172.18.16.40
   provisioningNetwork: Disabled
   watchAllNamespaces: true
