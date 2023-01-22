@@ -1,0 +1,6 @@
+---
+collections:
+  - name: community.general
+  - name: kubernetes.core
+  - name: hpe.ilo
+  - name: netbox.netbox
