@@ -5,6 +5,10 @@
       ansible.builtin.debug:
         var: cluster_deployment
 
+    - name: debug cluster_info
+      ansible.builtin.debug:
+        var: cluster_info
+
     - name: debug install_config
       ansible.builtin.debug:
         var: install_config
