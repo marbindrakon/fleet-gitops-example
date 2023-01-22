@@ -4,6 +4,8 @@ kind: ConfigMap
 metadata:
   name: base-config-ca-certs
   namespace: openshift-config
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
 data:
   ca-bundle.crt: |
 {{ .Values.cluster.trustedCABundle | indent 4 }}
