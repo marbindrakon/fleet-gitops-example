@@ -23,6 +23,8 @@
     netbox.netbox.netbox_ip_address:
       state: present
       data:
+        netbox_url: "{{ lookup('env', 'NETBOX_URL') }}"
+        netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
         prefix: 172.18.19.0/24
         assigned_object:
           name: bond1.19
