@@ -1,0 +1,12 @@
+{{- if .Values.cluster.trustedCABundle -}}
+apiVersion: config.openshift.io/v1
+kind: Proxy
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: '2'
+spec:
+  trustedCA:
+    name: "base-config-ca-certs"
+{{- end -}}

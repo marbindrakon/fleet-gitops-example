@@ -1,0 +1,10 @@
+{{- if .Values.cluster.trustedCABundle -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: base-config-ca-certs
+  namespace: openshift-config
+data:
+  ca-bundle.crt: |
+{{ .Values.cluster.trustedCABundle | indent 4 }}
+{{- end -}}

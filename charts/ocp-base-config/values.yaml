@@ -3,6 +3,7 @@ cluster:
   baseDomain: lab.signal9.gg
   gitOpsRepo: https://github.com/marbindrakon/rhte-2023-fleet-gitops.git
   gitOpsBasePath: argocd/clusters
+  trustedCABundle: ""
 
 externalSecrets:
   enabled: true
