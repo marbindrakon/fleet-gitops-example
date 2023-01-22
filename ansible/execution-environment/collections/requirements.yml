@@ -4,3 +4,4 @@ collections:
   - name: kubernetes.core
   - name: hpe.ilo
   - name: netbox.netbox
+  - name: freeipa.ansible_freeipa
