@@ -5,3 +5,4 @@ collections:
   - name: hpe.ilo
   - name: netbox.netbox
   - name: freeipa.ansible_freeipa
+  - name: community.hashi_vault
