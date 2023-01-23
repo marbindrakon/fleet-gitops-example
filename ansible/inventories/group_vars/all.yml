@@ -1,0 +1,128 @@
+# High-level variables used in cluster provisioning
+
+# DNS domain where all managed OCP clusters will be created
+base_dns_domain: "lab.signal9.gg"
+gitops_repo_path: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+
+# LB type can be external_haproxy or internal, this will likely be overridden
+# for each cluster
+loadbalancer_type: "external_haproxy"
+# Clusters that use internal-type load balancing will be exposed on the external LB
+# using a 1:1 mapping to the internal VIP
+expose_internal_loadbalancers: true
+# Frontend mode can be shared or dedicated
+loadbalancer_frontend_mode: "shared"
+loadbalancer_api_shared_frontend: "fe-ocp-api"
+loadbalancer_http_shared_frontend: "fe-ocp-http"
+loadbalancer_https_shared_frontend: "fe-ocp-https"
+loadbalancer_machineapi_shared_frontend: "fe-ocp-machineapi"
+loadbalancer_api_shared_vip: "75.8.216.227"
+loadbalancer_ingress_shared_vip: "75.8.216.227"
+
+# Multiple DNS providers can be enabled for split-horizon use cases
+enabled_dns_providers:
+  freeipa:
+    # If true, this provider will use the internal VIP when an
+    # internal VIP exists and is also exposed through the external
+    # LB.
+    # If false or an internal VIP does not exist, the external
+    # VIP will be used.
+    split_horizon_internal: true
+  route53:
+    split_horizion_internal: false
+
+
+hashicorp_vault:
+  url: "https://vault.lab.signal9.gg"
+  auth_type: jwt
+  auth_mount: k8s-rhte-acm-hub
+  jwt_location: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+  role: aap
+  # Policy to be used for new k8s auth methods
+  cluster_policy: "rht-lab-ocp"
+  # Vault secrets to be referenced when generating cluster configurations
+  cluster_secrets:
+    oidc: signal9-openid
+    cert-manager-dns: signal9-route53
+    cert-manager-acme-acct: rhte-le-account
+    pull-secret: ocp-pull-secret
+    openstack-cloud: opensnack-cloud-config
+    node-ssh: rhte-cluster-ssh-key
+
+platform_configs:
+  openstack:
+    vip_network: lab-net
+    use_existing_image: true
+    glance_image: rhcos-4.12.0
+    cluster_sizes:
+      sandbox:
+        controller_count: 1
+        worker_count: 0
+        controller_flavor: m1.2xlarge
+        root_volume_gb: 256
+      small:
+        controller_count: 3
+        worker_count: 3
+        controller_flavor: m1.xlarge
+        worker_flavor: m1.large
+        root_volume_gb: 128
+      medium:
+        controller_count: 3
+        worker_count: 3
+        controller_flavor: m1.xlarge
+        worker_flavor: m1.xlarge
+        root_volume_gb: 128
+      large:
+        controller_count: 3
+        worker_count: 6
+        controller_flavor: m1.2xlarge
+        worker_flavor: m1.xlarge
+        root_volume_gb: 128
+  infra_env_hybrid:
+    # Search for baremetal nodes in Netbox will be limited to this tag
+    netbox_pool_tag: "openshift-pool"
+    # Prefix for netbox tag applied to cluster nodes
+    netbox_cluster_tag_prefix: "ocp-cluster-"
+    vip_prefix: "172.18.16.0/24"
+    node_prefix: "172.18.16.0/24"
+    storage_prefix: "172.18.19.0/24"
+    storage_interface_names:
+      - "bond1.19"
+      - "ens224"
+    vmware_config:
+      datastore: "CEPH-NVME"
+      node_port_group: "ocp0-infra"
+      storage_port_group: "Ceph-ODF"
+      cluster_name: "XNA-ESX-1"
+    use_baremetal_operator: false
+    cluster_sizes:
+      sandbox:
+        controller_count: 1
+        controller_type: vmware
+        controller_vcpu: 8
+        controller_ram_gb: 32
+        controller_disk_gb: 256
+        worker_count: 0
+      small:
+        controller_count: 3
+        controller_type: vmware
+        controller_vcpu: 8
+        controller_ram_gb: 16
+        controller_disk_gb: 128
+        worker_count: 3
+        worker_type: vmware
+        worker_vcpu: 8
+        worker_ram_gb: 16
+        worker_disk_gb: 128
+      medium:
+        controller_count: 3
+        controller_type: ilo
+        worker_count: 0
+      large:
+        controller_count: 3
+        controller_type: vmware
+        controller_vcpu: 8
+        controller_ram_gb: 32
+        controller_disk_gb: 128
+        worker_count: 5
+        worker_type: ilo
