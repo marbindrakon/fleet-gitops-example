@@ -1,0 +1,10 @@
+all:
+  children:
+    ipaservers:
+      hosts:
+        xna-ipa-1.home.signal9.gg: {}
+    loadbalancers:
+      hosts:
+        xna-haproxy-a.lab.signal9.gg: {}
+        xna-haproxy-b.lab.signal9.gg: {}
+        xna-haproxy-c.home.signal9.gg: {}
