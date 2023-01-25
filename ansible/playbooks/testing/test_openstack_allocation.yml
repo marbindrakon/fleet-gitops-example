@@ -1,0 +1,24 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    cluster_platform: openstack
+    cluster_name: shift-stack-test
+    openstack_platform_config:
+      vip_network: lab-net
+  tasks:
+    - name: include resource_allocation role
+      ansible.builtin.include_role:
+        name: resource_allocation
+      vars:
+        cluster_state: present
+    - name: debug output
+      ansible.builtin.debug:
+        msg: "API: {{ api_vip }}  Ingess: {{ ingress_vip }}"
+    - name: include resource_allocation role
+      ansible.builtin.include_role:
+        name: resource_allocation
+      vars:
+        cluster_state: absent
+    - name: debug output
+      ansible.builtin.debug:
+        msg: "API: {{ api_vip }}  Ingess: {{ ingress_vip }}"

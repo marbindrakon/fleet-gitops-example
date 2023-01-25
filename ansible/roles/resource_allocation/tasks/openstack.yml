@@ -1,0 +1,67 @@
+---
+# Allocate FIPs using openstack CLI until openstack.cloud.floating_ip
+# supports creating a FIP without a server reference
+
+- name: check for existing api fip
+  ansible.builtin.command:
+    cmd: /usr/local/bin/openstack floating ip list --os-cloud devstack -f json --tags "{{ cluster_name|quote }}-api"
+  register: api_fip_query
+
+- name: check for existing ingress fip
+  ansible.builtin.command:
+    cmd: /usr/local/bin/openstack floating ip list --os-cloud devstack -f json --tags "{{ cluster_name|quote }}-ingress"
+  register: ingress_fip_query
+
+- name: parse existing floating ip queries
+  set_fact:
+    openstack_existing_api_fip: "{{ api_fip_query.stdout | from_json }}"
+    openstack_existing_ingress_fip: "{{ ingress_fip_query.stdout | from_json }}"
+
+- name: return existing api fip
+  set_fact:
+    api_vip: "{{ openstack_existing_api_fip[0]['Floating IP Address'] }}"
+  when: (openstack_existing_api_fip)
+
+- name: return existing ingress fip
+  set_fact:
+    ingress_vip: "{{ openstack_existing_ingress_fip[0]['Floating IP Address'] }}"
+  when: (openstack_existing_ingress_fip)
+
+- name: allocate api floating ip
+  ansible.builtin.command:
+    cmd: /usr/local/bin/openstack floating ip create --os-cloud devstack -f value -c floating_ip_address --tag "{{ cluster_name|quote }}-api" "{{ openstack_platform_config['vip_network']|quote }}"
+  register: api_fip_cmd
+  when: cluster_state == "present" and not (openstack_existing_api_fip)
+
+- name: allocate ingress floating ip
+  ansible.builtin.command:
+    cmd: /usr/local/bin/openstack floating ip create --os-cloud devstack -f value -c floating_ip_address --tag "{{ cluster_name|quote }}-ingress" "{{ openstack_platform_config['vip_network']|quote }}"
+  register: ingress_fip_cmd
+  when: cluster_state == "present" and not (openstack_existing_ingress_fip)
+
+- name: return new api fip
+  set_fact:
+    api_vip: "{{ api_fip_cmd.stdout }}"
+  when: cluster_state == "present" and not (openstack_existing_api_fip)
+
+- name: return new ingress fip
+  set_fact:
+    ingress_vip: "{{ ingress_fip_cmd.stdout }}"
+  when: cluster_state == "present" and not (openstack_existing_ingress_fip)
+
+- name: delete api fip
+  ansible.builtin.command:
+    cmd: /usr/local/bin/openstack floating ip delete --os-cloud devstack "{{ fip_to_delete['ID'] | quote }}"
+  when: cluster_state == "absent" and (openstack_existing_api_fip)
+  loop_control:
+    loop_var: fip_to_delete
+  loop: "{{ openstack_existing_api_fip }}"
+
+- name: delete ingress fip
+  ansible.builtin.command:
+    cmd: /usr/local/bin/openstack floating ip delete --os-cloud devstack "{{ fip_to_delete['ID'] | quote }}"
+  when: cluster_state == "absent" and (openstack_existing_ingress_fip)
+  loop_control:
+    loop_var: fip_to_delete
+  loop: "{{ openstack_existing_ingress_fip }}"
+

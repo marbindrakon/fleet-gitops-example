@@ -1,0 +1,3 @@
+---
+- name: Switch to platform-specific tasks
+  include_tasks: "{{ cluster_platform }}.yml"
