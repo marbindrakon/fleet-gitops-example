@@ -6,3 +6,5 @@ collections:
   - name: netbox.netbox
   - name: freeipa.ansible_freeipa
   - name: community.hashi_vault
+  - name: amazon.aws
+  - name: openstack.cloud

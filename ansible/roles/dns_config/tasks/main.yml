@@ -1,0 +1,44 @@
+---
+- name: determine split horizon status
+  ansible.builtin.set_fact:
+    dns_split_horizon: '{{ enabled_dns_providers|length > 1 }}'
+
+- name: initialize records lists
+  ansible.builtin.set_fact:
+    dns_internal_records: []
+    dns_external_records: []
+
+- name: construct dns names
+  ansible.builtin.set_fact:
+    dns_api_name: "api.{{ cluster_name }}"
+    dns_ingress_name: "*.apps.{{ cluster_name }}"
+    dns_int_api_name: "api-int.{{ cluster_name }}"
+
+- name: construct internal api record
+  ansible.builtin.set_fact:
+    dns_internal_records: '{{ dns_internal_records + [(dns_api_name, internal_api_vip)] }}'
+
+- name: construct internal api-int record
+  ansible.builtin.set_fact:
+    dns_internal_records: '{{ dns_internal_records + [(dns_int_api_name, internal_api_vip)] }}'
+  when: loadbalancer_type == "external"
+
+- name: construct internal ingress record
+  ansible.builtin.set_fact:
+    dns_internal_records: '{{ dns_internal_records + [(dns_ingress_name, internal_ingress_vip)] }}'
+
+- name: construct external api record
+  ansible.builtin.set_fact:
+    dns_external_records: '{{ dns_external_records + [(dns_api_name, external_api_vip)] }}'
+  when: (dns_split_horizon)
+
+- name: construct external ingress record
+  ansible.builtin.set_fact:
+    dns_external_records: '{{ dns_external_records + [(dns_ingress_name, external_ingress_vip)] }}'
+  when: (dns_split_horizon)
+
+- name: execute dns provider logic
+  ansible.builtin.include_tasks: "providers/{{ dns_provider.key }}.yml"
+  loop_control:
+    loop_var: dns_provider
+  loop: "{{ enabled_dns_providers | dict2items }}"

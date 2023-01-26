@@ -1,3 +1,6 @@
 ---
-- name: Switch to platform-specific tasks
-  include_tasks: "{{ cluster_platform }}.yml"
+- name: Run platform-specific tasks
+  include_tasks: "providers/{{ cluster_platform }}.yml"
+
+- name: Handle external VIP allocation
+  include_tasks: "external_vips.yml"

@@ -11,14 +11,20 @@
         name: resource_allocation
       vars:
         cluster_state: present
-    - name: debug output
+    - name: debug internal VIPs
       ansible.builtin.debug:
-        msg: "API: {{ api_vip }}  Ingess: {{ ingress_vip }}"
+        msg: "Internal: API: {{ internal_api_vip }}  Ingess: {{ internal_ingress_vip }}"
+    - name: debug external VIPs
+      ansible.builtin.debug:
+        msg: "External: API: {{ external_api_vip }}  Ingess: {{ external_ingress_vip }}"
     - name: include resource_allocation role
       ansible.builtin.include_role:
         name: resource_allocation
       vars:
         cluster_state: absent
-    - name: debug output
+    - name: debug internal VIPs
       ansible.builtin.debug:
-        msg: "API: {{ api_vip }}  Ingess: {{ ingress_vip }}"
+        msg: "Internal: API: {{ internal_api_vip }}  Ingess: {{ internal_ingress_vip }}"
+    - name: debug external VIPs
+      ansible.builtin.debug:
+        msg: "External: API: {{ external_api_vip }}  Ingess: {{ external_ingress_vip }}"

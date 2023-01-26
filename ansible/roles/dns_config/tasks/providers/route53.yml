@@ -1,0 +1,21 @@
+- name: handle internal records
+  amazon.aws.route53:
+    state: "{{ cluster_state }}"
+    zone: "{{ base_domain }}"
+    record: "{{ item[0] }}.{{ base_domain }}"
+    value: "{{ item[1] }}"
+    type: A
+    ttl: 1200
+  loop: "{{ dns_internal_records }}"
+  when: (not dns_split_horizon|bool) or dns_provider.value.split_horizon_internal|bool
+
+- name: handle external records
+  amazon.aws.route53:
+    state: "{{ cluster_state }}"
+    zone: "{{ base_domain }}"
+    record: "{{ item[0] }}.{{ base_domain }}"
+    value: "{{ item[1] }}"
+    type: A
+    ttl: 1200
+  loop: "{{ dns_external_records }}"
+  when: dns_split_horizon|bool and (not dns_provider.value.split_horizon_internal|bool)

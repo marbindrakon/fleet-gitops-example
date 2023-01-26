@@ -1,0 +1,20 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    cluster_platform: openstack
+    cluster_name: dns-test
+    internal_api_vip: 127.0.0.1
+    internal_ingress_vip: 127.0.0.2
+    external_api_vip: 127.0.0.3
+    external_ingress_vip: 127.0.0.4
+  tasks:
+    - name: include resource_allocation role
+      ansible.builtin.include_role:
+        name: dns_config
+      vars:
+        cluster_state: present
+    - name: include resource_allocation role
+      ansible.builtin.include_role:
+        name: dns_config
+      vars:
+        cluster_state: absent

@@ -1,0 +1,21 @@
+- name: handle internal records
+  freeipa.ansible_freeipa.ipadnsrecord:
+    state: "{{ cluster_state }}"
+    zone_name: "{{ base_domain }}"
+    name: "{{ item[0] }}"
+    record_value: "{{ item[1] }}"
+    record_type: A
+    record_ttl: 1200
+  loop: "{{ dns_internal_records }}"
+  when: (not dns_split_horizon|bool) or dns_provider.value.split_horizon_internal|bool
+
+- name: handle external records
+  freeipa.ansible_freeipa.ipadnsrecord:
+    state: "{{ cluster_state }}"
+    zone_name: "{{ base_domain }}"
+    name: "{{ item[0] }}"
+    record_value: "{{ item[1] }}"
+    record_type: A
+    record_ttl: 1200
+  loop: "{{ dns_external_records }}"
+  when: dns_split_horizon|bool and (not dns_provider.value.split_horizon_internal|bool)

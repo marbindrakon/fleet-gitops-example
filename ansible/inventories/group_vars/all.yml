@@ -1,12 +1,12 @@
 # High-level variables used in cluster provisioning
 
 # DNS domain where all managed OCP clusters will be created
-base_dns_domain: "lab.signal9.gg"
+base_domain: "lab.signal9.gg"
 gitops_repo_path: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
 
-# LB type can be external_haproxy or internal, this will likely be overridden
+# LB type can be external or internal, this will likely be overridden
 # for each cluster
-loadbalancer_type: "external_haproxy"
+loadbalancer_type: "external"
 # Clusters that use internal-type load balancing will be exposed on the external LB
 # using a 1:1 mapping to the internal VIP
 expose_internal_loadbalancers: true
@@ -18,6 +18,8 @@ loadbalancer_https_shared_frontend: "fe-ocp-https"
 loadbalancer_machineapi_shared_frontend: "fe-ocp-machineapi"
 loadbalancer_api_shared_vip: "75.8.216.227"
 loadbalancer_ingress_shared_vip: "75.8.216.227"
+# external_vip_prefix is only used when loadbalancer_frontend_mode is 'dedicated'
+external_vip_prefix: "172.18.16.0/24"
 
 # Multiple DNS providers can be enabled for split-horizon use cases
 enabled_dns_providers:
@@ -29,7 +31,7 @@ enabled_dns_providers:
     # VIP will be used.
     split_horizon_internal: true
   route53:
-    split_horizion_internal: false
+    split_horizon_internal: false
 
 
 hashicorp_vault:

@@ -19,12 +19,12 @@
 
 - name: return existing api fip
   set_fact:
-    api_vip: "{{ openstack_existing_api_fip[0]['Floating IP Address'] }}"
+    internal_api_vip: "{{ openstack_existing_api_fip[0]['Floating IP Address'] }}"
   when: (openstack_existing_api_fip)
 
 - name: return existing ingress fip
   set_fact:
-    ingress_vip: "{{ openstack_existing_ingress_fip[0]['Floating IP Address'] }}"
+    internal_ingress_vip: "{{ openstack_existing_ingress_fip[0]['Floating IP Address'] }}"
   when: (openstack_existing_ingress_fip)
 
 - name: allocate api floating ip
@@ -41,12 +41,12 @@
 
 - name: return new api fip
   set_fact:
-    api_vip: "{{ api_fip_cmd.stdout }}"
+    internal_api_vip: "{{ api_fip_cmd.stdout }}"
   when: cluster_state == "present" and not (openstack_existing_api_fip)
 
 - name: return new ingress fip
   set_fact:
-    ingress_vip: "{{ ingress_fip_cmd.stdout }}"
+    internal_ingress_vip: "{{ ingress_fip_cmd.stdout }}"
   when: cluster_state == "present" and not (openstack_existing_ingress_fip)
 
 - name: delete api fip
