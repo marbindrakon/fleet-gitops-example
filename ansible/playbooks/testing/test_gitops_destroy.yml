@@ -1,0 +1,22 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    cluster_platform: openstack
+    cluster_name: gitops-test-1
+    cluster_size: sandbox
+    cluster_state: absent
+    openstack_platform_config: "{{ platform_configs['openstack'] }}"
+    cluster_protected: false
+    cluster_image_set: img4.12.0-x86-64-appsub
+  tasks:
+    - name: include gitops_cluster_build role
+      ansible.builtin.include_role:
+        name: gitops_cluster_build
+
+    - name: include resource_allocation role
+      ansible.builtin.include_role:
+        name: resource_allocation
+
+    - name: include dns role
+      ansible.builtin.include_role:
+        name: dns_config

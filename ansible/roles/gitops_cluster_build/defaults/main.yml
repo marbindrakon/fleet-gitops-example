@@ -1,0 +1,9 @@
+---
+# defaults file for gitops_cluster_build
+#
+gitops_skip_push: false
+
+gitops_author_name: "Signal9 Ansible Automation"
+gitops_author_email: "aap@signal9.gg"
+
+cluster_special_feature: ""

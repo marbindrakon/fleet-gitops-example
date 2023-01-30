@@ -16,7 +16,6 @@ This role requires the following collections and their Python dependencies:
 
 * openstack.cloud
 * netbox.netbox
-* vmware.vmware_rest
 
 Role Variables
 --------------

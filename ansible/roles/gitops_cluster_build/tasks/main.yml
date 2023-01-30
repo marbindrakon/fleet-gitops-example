@@ -1,0 +1,90 @@
+---
+# tasks file for gitops_cluster_build
+
+- name: create temporary directory for gitops repo
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: gitops
+  register: gitops_temp_dir
+
+- name: clone gitops repository to temporary directory
+  ansible.builtin.git:
+    repo: "{{ gitops_repo_url_authed }}"
+    dest: "{{ gitops_temp_dir.path }}"
+  no_log: true
+
+- name: set git user name
+  ansible.builtin.command:
+    chdir: "{{ gitops_temp_dir.path }}"
+    cmd: "/usr/bin/git config user.name '{{ gitops_author_name }}'"
+
+- name: set git user email
+  ansible.builtin.command:
+    chdir: "{{ gitops_temp_dir.path }}"
+    cmd: "/usr/bin/git config user.email '{{ gitops_author_email }}'"
+
+- name: create new cluster directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ gitops_temp_dir.path }}/{{ item }}"
+  loop:
+    - "argocd/clusters/managed-clusters/{{ cluster_name }}/live/base-configs"
+    - "argocd/clusters/managed-clusters/{{ cluster_name }}/helm-values"
+  when: cluster_state == "present"
+
+- name: template cluster deployment
+  ansible.builtin.template:
+    src: "cluster-deploy-app.yaml.j2"
+    dest: "{{ gitops_temp_dir.path }}/{{ cluster_builds_dir }}/{{ cluster_name }}.yaml"
+  when: cluster_state == "present"
+
+- name: template cluster deployment values
+  ansible.builtin.template:
+    src: "{{ cluster_platform }}-build-values.yaml.j2"
+    dest: "{{ gitops_temp_dir.path }}/argocd/clusters/managed-clusters/{{ cluster_name }}/helm-values/build-values.yaml"
+  when: cluster_state == "present"
+
+- name: template base config
+  ansible.builtin.template:
+    src: "base-config-app.yaml.j2"
+    dest: "{{ gitops_temp_dir.path }}/argocd/clusters/managed-clusters/{{ cluster_name }}/live/base-configs/base-config-app.yaml"
+  when: cluster_state == "present"
+
+- name: template base config values
+  ansible.builtin.template:
+    src: "base-config-values.yaml.j2"
+    dest: "{{ gitops_temp_dir.path }}/argocd/clusters/managed-clusters/{{ cluster_name }}/helm-values/base-config-values.yaml"
+  when: cluster_state == "present"
+
+- name: run git add for new files
+  ansible.builtin.command:
+    cmd: "/usr/bin/git add {{ item }}"
+    chdir: "{{ gitops_temp_dir.path }}"
+  loop:
+    - "argocd/clusters/managed-clusters/{{ cluster_name }}"
+    - "{{ cluster_builds_dir }}"
+  when: cluster_state == "present"
+
+- name: delete cluster gitops configs
+  ansible.builtin.command:
+    cmd: "/usr/bin/git rm -r {{ item }}"
+    chdir: "{{ gitops_temp_dir.path }}"
+    removes: "{{ gitops_temp_dir.path }}/{{ item }}"
+  loop:
+    - "argocd/clusters/managed-clusters/{{ cluster_name }}"
+    - "{{ cluster_builds_dir }}/{{ cluster_name }}.yaml"
+  when: cluster_state == "absent"
+
+- name: commit changes
+  ansible.builtin.command:
+    cmd: '/usr/bin/git commit -a -m "Configure cluster {{ cluster_name }} via Ansible"'
+    chdir: "{{ gitops_temp_dir.path }}"
+  register: git_out
+  failed_when: not "nothing to commit, working tree clean" in git_out.stdout_lines and git_out.rc != 0
+  changed_when: not "nothing to commit, working tree clean" in git_out.stdout_lines
+
+- name: push changes
+  ansible.builtin.command:
+    cmd: "/usr/bin/git push"
+    chdir: "{{ gitops_temp_dir.path }}"
+  when: git_out.changed and not gitops_skip_push

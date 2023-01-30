@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ cluster_name }}-deploy
+  namespace: openshift-gitops
+{% if cluster_protected == False %}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+{% endif %}
+spec:
+  destination:
+    namespace: openshift-gitops
+    server: "https://kubernetes.default.svc"
+  ignoreDifferences:
+    - group: hive.openshift.io
+      kind: ClusterDeployment
+      jsonPointers:
+        - /spec/installed
+  project: default
+  syncPolicy:
+    automated: {}
+  source:
+    repoURL: "{{ gitops_repo_url }}"
+    path: "charts/mce-cluster-build"
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+        - "../../argocd/clusters/managed-clusters/{{ cluster_name }}/helm-values/build-values.yaml"

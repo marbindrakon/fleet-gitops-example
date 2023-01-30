@@ -1,0 +1,53 @@
+cluster:
+  name: "{{ cluster_name }}"
+  baseDomain: "{{ base_domain }}"
+  gitOpsRepo: "{{ gitops_repo_url }}"
+  gitOpsBasePath: argocd/clusters/managed-clusters
+
+monitoring:
+{% if cluster_platform == "openstack" %}
+  enabled: true
+  storageClass: standard-csi
+{% else %}
+  enabled: false
+{% endif %}
+
+externalSecrets:
+  vaultAuthPath: "k8s-{{ cluster_name }}"
+
+timesync:
+  enabled: true
+{% if cluster_platform == "openstack" %}
+  ptp:
+    enabled: true
+    loadKvmModule: true
+  ntpServers: []
+{% else %}
+  ntpServers: {{ cluster_ntp_sources }}
+{% endif %}
+
+auth:
+  oidcClientID: "{{ cluster_sso_client_id }}"
+  externalSecret:
+    name: oauth-signal9-client-secret
+    vaultName: {{ hashicorp_vault['cluster_secrets']['oidc'] }}
+
+certManager:
+  externalSecret:
+    name: route53-key
+    vaultName: {{ hashicorp_vault['cluster_secrets']['cert-manager-dns'] }}
+  solvers:
+    - http01:
+        ingress: {}
+    - dns01:
+        route53:
+          # Required prior to 1.9 when this can be moved to a 
+          # secret and pulled from vault like the secret key
+          accessKeyID: AKIAR3Z7ELN7VLNNHZHZ
+          region: us-east-1
+          secretAccessKeySecretRef:
+            key: secret-access-key
+            name: route53-key
+      selector:
+        dnsZones:
+          - {{ base_domain }}

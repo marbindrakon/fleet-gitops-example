@@ -1,0 +1,41 @@
+cluster:
+  importToHub: true
+{% if hub_type == 'acm' %}
+  useACM: true
+  createGitopsManifestWorks: false
+{% else %}
+  createGitopsManifestWorks: true
+{% endif %}
+  name: {{ cluster_name }}
+  baseDomain: {{ base_domain }}
+  clusterImageSet: {{ cluster_image_set }}
+  controlPlaneCount: {{ openstack_platform_config['cluster_sizes'][cluster_size]['controller_count'] }}
+  workerCount: {{ openstack_platform_config['cluster_sizes'][cluster_size]['worker_count'] }}
+  apiVIP: "{{ internal_api_vip }}"
+  ingressVIP: "{{ internal_ingress_vip }}"
+  pullSecretVault: "{{ hashicorp_vault['cluster_secrets']['pull-secret'] }}"
+  trustedCAs: |
+    {{ cluster_trust_bundle | indent(4) }}
+  sshKeyVault: "{{ hashicorp_vault['cluster_secrets']['node-ssh'] }}"
+  sshPubKey: "{{ cluster_ssh_pubkey }}"
+  dnsServers: {{ cluster_dns_servers | to_json }}
+provider:
+  providerCredsVault: {{ hashicorp_vault['cluster_secrets']['openstack-cloud'] }}
+  providerCAs: |
+    {{ openstack_platform_config['platform_ca_bundle'] | indent(4) }}
+  type: OpenStack
+  openstack:
+{% if openstack_platform_config['use_existing_image'] == True %}
+    existingImage: {{ openstack_platform_config['glance_image'] }}
+{% endif %}
+    externalNetwork: {{ openstack_platform_config['vip_network'] }}
+    computeAZs: null
+{% if 'gpu' in cluster_special_feature|lower and cluster_size == 'sandbox' %}
+    controlPlaneFlavor: {{ openstack_platform_config['cluster_sizes'][cluster_size]['gpu_flavor'] }}
+{% else %}
+{% endif %}
+{% if 'gpu' in cluster_special_feature|lower %}
+    workerFlavor: {{ openstack_platform_config['cluster_sizes'][cluster_size]['gpu_flavor'] }}
+{% else %}
+    workerFlavor: {{ openstack_platform_config['cluster_sizes'][cluster_size]['worker_flavor'] }}
+{% endif %}
