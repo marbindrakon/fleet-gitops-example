@@ -88,3 +88,8 @@
     cmd: "/usr/bin/git push"
     chdir: "{{ gitops_temp_dir.path }}"
   when: git_out.changed and not gitops_skip_push
+
+- name: delete temporary directory
+  ansible.builtin.file:
+    path: "{{ gitops_temp_dir.path }}"
+    state: absent
