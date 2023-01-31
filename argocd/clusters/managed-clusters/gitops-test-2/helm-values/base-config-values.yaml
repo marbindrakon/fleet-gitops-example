@@ -9,7 +9,7 @@ monitoring:
   storageClass: standard-csi
 
 externalSecrets:
-  vaultAuthPath: "k8s-gitops-test-2"
+  vaultAuthPath: "k8s-mgd-gitops-test-2"
 
 timesync:
   enabled: true
