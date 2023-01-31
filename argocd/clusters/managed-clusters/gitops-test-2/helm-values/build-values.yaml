@@ -4,11 +4,11 @@ cluster:
   createGitopsManifestWorks: false
   name: gitops-test-2
   baseDomain: lab.signal9.gg
-  clusterImageSet: img4.12.0-x86-64-appsub
+  clusterImageSet: img4.12.1-x86-64-appsub
   controlPlaneCount: 3
   workerCount: 3
-  apiVIP: "172.18.104.233"
-  ingressVIP: "172.18.104.65"
+  apiVIP: "172.18.104.83"
+  ingressVIP: "172.18.104.82"
   pullSecretVault: "ocp-pull-secret"
   trustedCAs: |
     -----BEGIN CERTIFICATE-----
