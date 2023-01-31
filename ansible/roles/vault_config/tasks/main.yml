@@ -37,10 +37,6 @@
     delay: 10
     no_log: true
 
-  - name: debug resources
-    debug:
-      msg: "{{ kubeconfig_secret }}"
-  
   - name: load cluster kubeconfig
     ansible.builtin.set_fact:
       cluster_kubeconfig: "{{ kubeconfig_secret.resources.0.data.kubeconfig | b64decode | from_yaml }}"
