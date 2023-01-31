@@ -1,0 +1,14 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    cluster_platform: openstack
+    cluster_name: gitops-test-1
+    cluster_size: small
+    cluster_state: present
+    openstack_platform_config: "{{ platform_configs['openstack'] }}"
+    cluster_protected: false
+    cluster_image_set: img4.12.0-x86-64-appsub
+  tasks:
+    - name: include vault_config
+      ansible.builtin.include_role:
+        name: vault_config

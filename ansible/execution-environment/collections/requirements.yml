@@ -5,6 +5,8 @@ collections:
   - name: hpe.ilo
   - name: netbox.netbox
   - name: freeipa.ansible_freeipa
-  - name: community.hashi_vault
+  - name: https://github.com/marbindrakon/community.hashi_vault.git
+    type: git
+    version: delete_function
   - name: amazon.aws
   - name: openstack.cloud

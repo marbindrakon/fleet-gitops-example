@@ -1,0 +1,105 @@
+---
+- name: read serviceaccount token
+  no_log: true
+  ansible.builtin.set_fact:
+    vault_jwt: "{{ lookup('ansible.builtin.file', hashicorp_vault['jwt_location']) }}"
+
+- name: list enabled auth methods
+  community.hashi_vault.vault_read:
+    url: "{{ hashicorp_vault['url'] }}"
+    auth_method: jwt
+    mount_point: "{{ hashicorp_vault['auth_mount'] }}"
+    role_id: "{{ hashicorp_vault['auth_role'] }}"
+    jwt: "{{ vault_jwt }}"
+    path: "sys/auth"
+  failed_when: vault_existing_auth_raw.data is not defined and "doesn't seem to exist" not in vault_existing_auth_raw.msg
+  register: vault_existing_auth_raw
+
+- name: save existing auth method
+  ansible.builtin.set_fact:
+    vault_existing_auth: "{{ vault_existing_auth_raw.data.get(hashicorp_vault['vault_managed_auth_name'] +'/', {}) }}"
+
+- name: create k8s auth method
+  block:
+  - name: Get kubeconfig secret
+    kubernetes.core.k8s_info:
+      api_version: v1
+      kind: Secret
+      namespace: "{{ cluster_name }}"
+      label_selectors:
+        - "hive.openshift.io/secret-type=kubeconfig"
+      wait: true
+      wait_sleep: 10
+      wait_timeout: 1200
+    register: kubeconfig_secret
+    no_log: true
+  
+  - name: load cluster kubeconfig
+    ansible.builtin.set_fact:
+      cluster_kubeconfig: "{{ kubeconfig_secret.resources.0.data.kubeconfig | b64decode | from_yaml }}"
+    no_log: true
+
+  - name: extract initial api ca bundle and combine with inventory
+    ansible.builtin.set_fact:
+      vault_k8s_ca_bundle: |
+        {{ cluster_kubeconfig['clusters'][0]['cluster']['certificate-authority-data'] | b64decode }}
+        {{ cluster_trust_bundle }}
+
+  - name: write k8s auth method to vault
+    community.hashi_vault.vault_write:
+      url: "{{ hashicorp_vault['url'] }}"
+      auth_method: jwt
+      mount_point: "{{ hashicorp_vault['auth_mount'] }}"
+      role_id: "{{ hashicorp_vault['auth_role'] }}"
+      jwt: "{{ vault_jwt }}"
+      path: "sys/auth/{{ hashicorp_vault['vault_managed_auth_name'] }}"
+      data:
+        type: kubernetes
+        kubernetes_host: "https://api.{{ cluster_name }}.{{ base_domain }}:6443"
+        kubernetes_ca_cert: "{{ vault_k8s_ca_bundle }}"
+        disable_local_ca_jwt: true
+        disable_iss_validation: true
+
+  - name: write k8s auth method config to vault
+    community.hashi_vault.vault_write:
+      url: "{{ hashicorp_vault['url'] }}"
+      auth_method: jwt
+      mount_point: "{{ hashicorp_vault['auth_mount'] }}"
+      role_id: "{{ hashicorp_vault['auth_role'] }}"
+      jwt: "{{ vault_jwt }}"
+      path: "auth/{{ hashicorp_vault['vault_managed_auth_name'] }}/config"
+      data:
+        kubernetes_host: "https://api.{{ cluster_name }}.{{ base_domain }}:6443"
+        kubernetes_ca_cert: "{{ vault_k8s_ca_bundle }}"
+        disable_local_ca_jwt: true
+        disable_iss_validation: true
+
+  - name: write external-secrets-operator role to vault
+    community.hashi_vault.vault_write:
+      url: "{{ hashicorp_vault['url'] }}"
+      auth_method: jwt
+      mount_point: "{{ hashicorp_vault['auth_mount'] }}"
+      role_id: "{{ hashicorp_vault['auth_role'] }}"
+      jwt: "{{ vault_jwt }}"
+      path: "auth/{{ hashicorp_vault['vault_managed_auth_name'] }}/role/external-secrets-operator"
+      data:
+        alias_name_source: serviceaccount_uid
+        bound_service_account_names:
+          - external-secrets-operator
+        bound_service_account_namespaces:
+          - external-secrets-operator
+        token_policies:
+          - "{{ hashicorp_vault['cluster_policy'] }}"
+
+  when: cluster_state == "present" and not (vault_existing_auth)
+
+- name: remove auth method
+  community.hashi_vault.vault_delete:
+    url: "{{ hashicorp_vault['url'] }}"
+    auth_method: jwt
+    mount_point: "{{ hashicorp_vault['auth_mount'] }}"
+    role_id: "{{ hashicorp_vault['auth_role'] }}"
+    jwt: "{{ vault_jwt }}"
+    path: "sys/auth/{{ hashicorp_vault['vault_managed_auth_name'] }}"
+  when: cluster_state == "absent" and (vault_existing_auth)
+

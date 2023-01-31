@@ -42,12 +42,15 @@ hashicorp_vault:
   auth_type: jwt
   auth_mount: k8s-rhte-acm-hub
   jwt_location: "/var/run/secrets/kubernetes.io/serviceaccount/token"
-  role: aap
+  auth_role: aap
   # Policy to be used for new k8s auth methods
   cluster_policy: "rht-lab-ocp"
+  # Name for new k8s auth method
+  vault_managed_auth_name: "k8s-mgd-{{ cluster_name }}"
+  secret_base_path: lab/rht-shared
   # Vault secrets to be referenced when generating cluster configurations
   cluster_secrets:
-    oidc: signal9-openid
+    oidc: "{{ cluster_name }}-openid"
     cert-manager-dns: signal9-route53
     cert-manager-acme-acct: rhte-le-account
     pull-secret: ocp-pull-secret
@@ -55,7 +58,8 @@ hashicorp_vault:
     node-ssh: rhte-cluster-ssh-key
 
 # CA bundle to be added to provisioned clusters, may not match platform
-# bundle
+# bundle. Should include the root CA for the OCP API even if it is normally
+# public for Vault configuration.
 cluster_trust_bundle: |
   -----BEGIN CERTIFICATE-----
   MIICkTCCAhagAwIBAgIUX1Cm8VWt4ki4+8XH7oKsYYKJM+QwCgYIKoZIzj0EAwIw
@@ -73,6 +77,37 @@ cluster_trust_bundle: |
   Prnm+r+JzVu8vd0r2HxgwloEkElTr29S+DAAE8XlUpoXpQIxALEd+sYGr1qENJqr
   vHOvuo0diFSUxjvTjowus6kM6nZi1JR4rMycICsGgujg8zwVAw==
   -----END CERTIFICATE-----
+  -----BEGIN CERTIFICATE-----
+  MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+  TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+  cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
+  WhcNMzUwNjA0MTEwNDM4WjBPMQswCQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJu
+  ZXQgU2VjdXJpdHkgUmVzZWFyY2ggR3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBY
+  MTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAK3oJHP0FDfzm54rVygc
+  h77ct984kIxuPOZXoHj3dcKi/vVqbvYATyjb3miGbESTtrFj/RQSa78f0uoxmyF+
+  0TM8ukj13Xnfs7j/EvEhmkvBioZxaUpmZmyPfjxwv60pIgbz5MDmgK7iS4+3mX6U
+  A5/TR5d8mUgjU+g4rk8Kb4Mu0UlXjIB0ttov0DiNewNwIRt18jA8+o+u3dpjq+sW
+  T8KOEUt+zwvo/7V3LvSye0rgTBIlDHCNAymg4VMk7BPZ7hm/ELNKjD+Jo2FR3qyH
+  B5T0Y3HsLuJvW5iB4YlcNHlsdu87kGJ55tukmi8mxdAQ4Q7e2RCOFvu396j3x+UC
+  B5iPNgiV5+I3lg02dZ77DnKxHZu8A/lJBdiB3QW0KtZB6awBdpUKD9jf1b0SHzUv
+  KBds0pjBqAlkd25HN7rOrFleaJ1/ctaJxQZBKT5ZPt0m9STJEadao0xAH0ahmbWn
+  OlFuhjuefXKnEgV4We0+UXgVCwOPjdAvBbI+e0ocS3MFEvzG6uBQE3xDk3SzynTn
+  jh8BCNAw1FtxNrQHusEwMFxIt4I7mKZ9YIqioymCzLq9gwQbooMDQaHWBfEbwrbw
+  qHyGO0aoSCqI3Haadr8faqU9GY/rOPNk3sgrDQoo//fb4hVC1CLQJ13hef4Y53CI
+  rU7m2Ys6xt0nUW7/vGT1M0NPAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNV
+  HRMBAf8EBTADAQH/MB0GA1UdDgQWBBR5tFnme7bl5AFzgAiIyBpY9umbbjANBgkq
+  hkiG9w0BAQsFAAOCAgEAVR9YqbyyqFDQDLHYGmkgJykIrGF1XIpu+ILlaS/V9lZL
+  ubhzEFnTIZd+50xx+7LSYK05qAvqFyFWhfFQDlnrzuBZ6brJFe+GnY+EgPbk6ZGQ
+  3BebYhtF8GaV0nxvwuo77x/Py9auJ/GpsMiu/X1+mvoiBOv/2X/qkSsisRcOj/KK
+  NFtY2PwByVS5uCbMiogziUwthDyC3+6WVwW6LLv3xLfHTjuCvjHIInNzktHCgKQ5
+  ORAzI4JMPJ+GslWYHb4phowim57iaztXOoJwTdwJx4nLCgdNbOhdjsnvzqvHu7Ur
+  TkXWStAmzOVyyghqpZXjFaH3pO3JLF+l+/+sKAIuvtd7u+Nxe5AW0wdeRlN8NwdC
+  jNPElpzVmbUq4JUagEiuTDkHzsxHpFKVK7q4+63SM1N95R1NbdWhscdCb+ZAJzVc
+  oyi3B43njTOQ5yOf+1CceWxG1bQVs5ZufpsMljq4Ui0/1lvh+wjChP4kqKOJ2qxq
+  4RgqsahDYVvTH9w7jXbyLeiNdd8XM2w9U/t7y0Ff/9yi0GE44Za4rF2LN9d11TPA
+  mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
+  emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
+  -----END CERTIFICATE-----
 
 cluster_ssh_pubkey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDgvctEXuDg84taMVkL+cD8ny5F6f0+mYsMfTYa48SdBhU9nwB/W4/7vmTMNASWf0urWSDl4YtzSrsca5I1v8VA1LLdqSWD/bFPlLNRtZ4wTKidk9uk1uP5JyeYUpLB31Sq5P7cyzKcd8OaHgDgzPSk0nZIcrcU/hdO/A0UcMGEFZ4fDuMAVhHdjto7k4rQbyAZtsdkfDbex14wiNNy4bHeQxECV644+GAPy7xXDUT4j/AF1ud7sXTq1hnlIc12FtaIQZ3WGX69Om3Qv5XJL3mdYafX721xEIdyX+U8obr+dc2E7TtLxcrHCb8Rqko6rvy8YLLPx+2Dj4ypuDZCmS/3vWQ50kEwRsWze20z835cJEodNS5wo0RanrrGgCGRMlMi9xNofBWnvpr7VCBXgywPN2JmfDwDcurBvJ++L8ednadGI7Xqp8Q17LIM9b8ag92GeZ86ycmaVJUKCb5DRScMsn6UCC9QBL2I9pP+GKDNzjGFTXga+WSU0vhE5Jsng1c= rhte-demo@ocp-ansible-bastion.lab.signal9.gg"
 
@@ -82,7 +117,7 @@ cluster_dns_servers:
 
 cluster_ntp_soruces: "{{ cluster_dns_servers }}"
 
-cluster_sso_client_id: openshift
+cluster_sso_client_id: "{{ cluster_name }}-openshift"
 
 platform_configs:
   openstack:
