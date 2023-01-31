@@ -1,0 +1,71 @@
+---
+- name: read serviceaccount token
+  no_log: true
+  ansible.builtin.set_fact:
+    vault_jwt: "{{ lookup('ansible.builtin.file', hashicorp_vault['jwt_location']) }}"
+  when: vault_jwt is not defined
+
+- name: ensure sso client state
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ cluster_sso['sso_url'] }}"
+    auth_realm: "{{ cluster_sso['admin_realm'] }}"
+    auth_username: "{{ sso_admin_user }}"
+    auth_password: "{{ sso_admin_password }}"
+    client_id: "{{ cluster_sso['client_id'] }}"
+    public_client: false
+    client_authenticator_type: client-secret
+    protocol: openid-connect
+    enabled: true
+    realm: "{{ cluster_sso['client_realm'] }}"
+    redirect_uris:
+      - "https://oauth-openshift.apps.{{ cluster_name }}.{{ base_domain }}/oauth2callback/{{ cluster_sso['console_sso_label'] }}"
+    protocol_mappers:
+      - name: "client roles"
+        consentRequired: false
+        protocol: "openid-connect"
+        protocolMapper: "oidc-usermodel-client-role-mapper"
+        config:
+          access.token.claim: true
+          claim.name: groups
+          id.token.claim: true
+          jsonType.label: String
+          multivalued: true
+          usermodel.clientRoleMapping.clientId: "{{ cluster_sso['role_source_client'] }}"
+    state: "{{ cluster_state }}"
+
+- name: get client secret for client
+  community.general.keycloak_clientsecret_info:
+    auth_keycloak_url: "{{ cluster_sso['sso_url'] }}"
+    auth_realm: "{{ cluster_sso['admin_realm'] }}"
+    auth_username: "{{ sso_admin_user }}"
+    auth_password: "{{ sso_admin_password }}"
+    client_id: "{{ cluster_sso['client_id'] }}"
+    realm: "{{ cluster_sso['client_realm'] }}"
+  no_log: true
+  register: sso_client_secret_resp
+  when: cluster_state == "present"
+
+- name: write client secret to vault
+  community.hashi_vault.vault_write:
+    url: "{{ hashicorp_vault['url'] }}"
+    auth_method: jwt
+    mount_point: "{{ hashicorp_vault['auth_mount'] }}"
+    role_id: "{{ hashicorp_vault['auth_role'] }}"
+    jwt: "{{ vault_jwt }}"
+    path: "{{ hashicorp_vault['secret_base_path'] }}/data/{{ hashicorp_vault['cluster_secrets']['oidc'] }}"
+    data:
+      data:
+        clientSecret: "{{ sso_client_secret_resp.clientsecret_info.value }}"
+  no_log: true
+  when: cluster_state == "present"
+
+- name: delete client secret from vault
+  community.hashi_vault.vault_delete:
+    url: "{{ hashicorp_vault['url'] }}"
+    auth_method: jwt
+    mount_point: "{{ hashicorp_vault['auth_mount'] }}"
+    role_id: "{{ hashicorp_vault['auth_role'] }}"
+    jwt: "{{ vault_jwt }}"
+    path: "{{ hashicorp_vault['secret_base_path'] }}/data/{{ hashicorp_vault['cluster_secrets']['oidc'] }}"
+  no_log: true
+  when: cluster_state == "absent"

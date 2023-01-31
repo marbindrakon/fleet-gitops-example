@@ -7,3 +7,8 @@ gitops_author_name: "Signal9 Ansible Automation"
 gitops_author_email: "aap@signal9.gg"
 
 cluster_special_feature: ""
+
+# When deleting a cluster, don't delete the spoke cluster gitops configs
+# This is useful for debugging and to avoid certain race
+# conditions on cluster deletion
+gitops_retain_cluster_configs: true

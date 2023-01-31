@@ -10,11 +10,11 @@
   tasks:
     - name: include vault_config
       ansible.builtin.include_role:
-        name: vault_config
+        name: sso_client
       vars:
         cluster_state: present
     - name: include vault_config
       ansible.builtin.include_role:
-        name: vault_config
+        name: sso_client
       vars:
         cluster_state: absent

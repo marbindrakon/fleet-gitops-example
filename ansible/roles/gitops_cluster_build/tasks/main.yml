@@ -65,7 +65,16 @@
     - "{{ cluster_builds_dir }}"
   when: cluster_state == "present"
 
-- name: delete cluster gitops configs
+- name: delete cluster gitops configs (retain cluster configs)
+  ansible.builtin.command:
+    cmd: "/usr/bin/git rm -r {{ item }}"
+    chdir: "{{ gitops_temp_dir.path }}"
+    removes: "{{ gitops_temp_dir.path }}/{{ item }}"
+  loop:
+    - "{{ cluster_builds_dir }}/{{ cluster_name }}.yaml"
+  when: cluster_state == "absent" and gitops_retain_cluster_configs == true
+
+- name: delete cluster gitops configs (destroy cluster configs)
   ansible.builtin.command:
     cmd: "/usr/bin/git rm -r {{ item }}"
     chdir: "{{ gitops_temp_dir.path }}"
@@ -73,7 +82,7 @@
   loop:
     - "argocd/clusters/managed-clusters/{{ cluster_name }}"
     - "{{ cluster_builds_dir }}/{{ cluster_name }}.yaml"
-  when: cluster_state == "absent"
+  when: cluster_state == "absent" and gitops_retain_cluster_configs == false
 
 - name: commit changes
   ansible.builtin.command:

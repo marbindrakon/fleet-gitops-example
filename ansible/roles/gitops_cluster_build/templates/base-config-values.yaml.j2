@@ -13,7 +13,7 @@ monitoring:
 {% endif %}
 
 externalSecrets:
-  vaultAuthPath: "k8s-{{ cluster_name }}"
+  vaultAuthPath: "{{ hashicorp_vault['vault_managed_auth_name'] }}"
 
 timesync:
   enabled: true
@@ -27,7 +27,7 @@ timesync:
 {% endif %}
 
 auth:
-  oidcClientID: "{{ cluster_sso_client_id }}"
+  oidcClientID: "{{ cluster_sso['client_id'] }}"
   externalSecret:
     name: oauth-signal9-client-secret
     vaultName: {{ hashicorp_vault['cluster_secrets']['oidc'] }}

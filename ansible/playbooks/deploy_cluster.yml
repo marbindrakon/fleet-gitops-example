@@ -1,0 +1,36 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    cluster_state: present
+  tasks:
+    - name: set platform config fact
+      ansible.builtin.set_fact:
+        "{{ cluster_platform }}_platform_config": "{{ platform_configs[cluster_platform] }}"
+
+    - name: set cluster image set
+      ansible.builtin.set_fact:
+        cluster_image_set: "img{{ cluster_version }}-x86-64-appsub"
+
+    - name: include resource_allocation role
+      ansible.builtin.include_role:
+        name: resource_allocation
+
+    - name: include dns role
+      ansible.builtin.include_role:
+        name: dns_config
+
+    - name: include sso_client role
+      ansible.builtin.include_role:
+        name: sso_client
+
+    - name: include gitops_cluster_build role
+      ansible.builtin.include_role:
+        name: gitops_cluster_build
+
+    - name: wait two minutes because of secrets race condition
+      ansible.builtin.pause:
+        seconds: 120
+
+    - name: include vault_config role
+      ansible.builtin.include_role:
+        name: vault_config

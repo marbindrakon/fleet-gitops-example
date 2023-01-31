@@ -117,7 +117,13 @@ cluster_dns_servers:
 
 cluster_ntp_soruces: "{{ cluster_dns_servers }}"
 
-cluster_sso_client_id: "{{ cluster_name }}-openshift"
+cluster_sso:
+  client_id: "{{ cluster_name }}-openshift"
+  sso_url: https://login.home.signal9.gg/auth
+  admin_realm: master
+  role_source_client: openshift
+  client_realm: "Signal9-RHT"
+  console_sso_label: "Signal9-RHT"
 
 platform_configs:
   openstack:
