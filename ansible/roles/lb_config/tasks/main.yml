@@ -199,10 +199,10 @@
         block: |
           backend be-{{ cluster_name }}-https
               mode tcp
-              server {{ cluster_name }}-vip {{ internal_api_vip }}:443 check
+              server {{ cluster_name }}-vip {{ internal_ingress_vip }}:443 check
 
           backend be-{{ cluster_name }}-http
-              server {{ cluster_name }}-vip {{ internal_api_vip }}:80 check
+              server {{ cluster_name }}-vip {{ internal_ingress_vip }}:80 check
         state: "{{ cluster_state }}"
       notify: "reload haproxy"
       when: loadbalancer_type == "internal" and expose_internal_loadbalancers == true
