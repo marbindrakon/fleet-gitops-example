@@ -32,5 +32,7 @@ spec:
     userManagedNetworking: {{ .Values.provider.infraenv.useExternalLB }}
   provisionRequirements:
     controlPlaneAgents: {{ .Values.cluster.controlPlaneCount }}
+{{ if .Values.cluster.workerCount }}
     workerAgents: {{ .Values.cluster.workerCount }}
+{{ end }}
 {{- end -}}

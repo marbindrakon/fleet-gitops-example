@@ -25,7 +25,9 @@ spec:
   platform:
 {{ if eq .Values.provider.type "InfraEnv" }}
     agentBareMetal:
-      agentSelector: {}
+      agentSelector:
+        matchLabels:
+          agentclusterinstalls.extensions.hive.openshift.io/location: {{ .Values.cluster.name }}
 {{ end }}
 {{ if eq .Values.provider.type "OpenStack" }}
     openstack:
