@@ -6,6 +6,8 @@ kind: NMStateConfig
 metadata:
   namespace: {{ $.Values.cluster.name }}
   name: {{ $host }}
+  labels:
+    infraenvs.agent-install.openshift.io: {{ .Values.cluster.name }}
 spec:
   {{- toYaml $netconf | nindent 2 }}
 ---
