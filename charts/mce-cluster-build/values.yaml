@@ -26,3 +26,12 @@ provider:
     computeAZs: []
     controlPlaneFlavor: m1.xlarge
     workerFlavor: m1.large
+  infraenv:
+    networkType: static
+    useExternalLB: true
+    machineCIDR: ""
+    ntpServers:
+      - 172.18.0.79
+      - 172.18.42.10
+      - 172.18.42.11
+    hostNetworkConfigs: {}

@@ -1,0 +1,36 @@
+{{- if eq .Values.provider.type "InfraEnv" -}}
+apiVersion: extensions.hive.openshift.io/v1beta1
+kind: AgentClusterInstall
+metadata:
+  name: {{ .Values.cluster.name }}
+  namespace: {{ .Values.cluster.name }}
+  finalizers:
+    - agentclusterinstall.agent-install.openshift.io/ai-deprovision
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  clusterDeploymentRef:
+    name: {{ .Values.cluster.name }}
+  imageSetRef:
+{{ if .Values.cluster.clusterImageSet }}
+    name: {{ .Values.cluster.clusterImageSet }}
+{{ else }}
+    name: {{ .Values.cluster.name }}-custom
+{{ end }}
+{{ if not (eq .Values.provider.infraenv.useExternalLB true) }}
+  apiVIP: {{ .Values.cluster.apiVIP }}
+  ingressVIP: {{ .Values.cluster.ingressVIP }}
+{{ end }}
+  networking:
+    clusterNetwork:
+      - cidr: 10.128.0.0/14
+        hostPrefix: 23
+    machineNetwork:
+      - cidr: {{ .Values.provider.infraenv.machineCIDR }}
+    serviceNetwork:
+      - 172.30.0.0/16
+    userManagedNetworking: {{ .Values.provider.infraenv.useExternalLB }}
+  provisionRequirements:
+    controlPlaneAgents: {{ .Values.cluster.controlPlaneCount }}
+    workerAgents: {{ .Values.cluster.workerCount }}
+{{- end -}}

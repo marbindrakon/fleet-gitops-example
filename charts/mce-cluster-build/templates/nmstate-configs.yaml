@@ -1,0 +1,13 @@
+{{- if .Values.provider.infraenv.hostNetworkConfigs -}}
+---
+{{ range $host, $netconf := .Values.provider.infraenv.hostNetworkConfigs }}
+apiVersion: agent-install.openshift.io/v1beta1
+kind: NMStateConfig
+metadata:
+  namespace: {{ $.Values.cluster.name }}
+  name: {{ $host }}
+spec:
+  {{- toYaml $netconf | nindent 2 }}
+---
+{{ end }}
+{{- end -}}

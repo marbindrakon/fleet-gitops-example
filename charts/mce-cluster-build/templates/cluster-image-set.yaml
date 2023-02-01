@@ -1,0 +1,8 @@
+{{- if and (eq .Values.provider.type "InfraEnv") .Values.cluster.releaseImage -}}
+apiVersion: hive.openshift.io/v1
+kind: ClusterImageSet
+metadata:
+  name: {{ .Values.cluster.name }}-custom
+spec:
+  releaseImage: {{ .Values.cluster.releaseImage }}
+{{- end -}}

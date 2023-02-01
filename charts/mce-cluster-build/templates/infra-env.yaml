@@ -1,0 +1,31 @@
+{{- if eq .Values.provider.type "InfraEnv" -}}
+apiVersion: agent-install.openshift.io/v1beta1
+kind: InfraEnv
+metadata:
+  name: {{ .Values.cluster.name }}
+  namespace: {{ .Values.cluster.name }}
+  finalizers:
+    - infraenv.agent-install.openshift.io/ai-deprovision
+  annotations:  
+    argocd.argoproj.io/sync-wave: '0'
+  labels:
+    agentclusterinstalls.extensions.hive.openshift.io/location: {{ .Values.cluster.name }}
+    networkType: {{ .Values.provider.infraenv.networkType }}
+spec:
+{{ if .Values.provider.infraenv.ntpServers }}
+  additionalNTPSources:
+{{ range .Values.provider.infraenv.ntpServers }}
+    - {{ . }}
+{{ end }}
+{{ end }}
+  agentLabels:
+    agentclusterinstalls.extensions.hive.openshift.io/location: {{ .Values.cluster.name }}
+  cpuArchitecture: x86_64
+  ipxeScriptType: DiscoveryImageAlways
+  nmStateConfigLabelSelector:
+    matchLabels:
+      infraenvs.agent-install.openshift.io: {{ .Values.cluster.name }}
+  pullSecretRef:
+    name: {{ .Values.cluster.name }}-pull-secret
+  sshAuthorizedKey: {{ .Values.cluster.sshPubKey }}
+{{- end -}}
