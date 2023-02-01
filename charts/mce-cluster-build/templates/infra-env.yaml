@@ -12,6 +12,9 @@ metadata:
     agentclusterinstalls.extensions.hive.openshift.io/location: {{ .Values.cluster.name }}
     networkType: {{ .Values.provider.infraenv.networkType }}
 spec:
+  clusterRef:
+    name: {{ .Values.cluster.name }}
+    namespace: {{ .Values.cluster.name }}
 {{ if .Values.provider.infraenv.ntpServers }}
   additionalNTPSources:
 {{ range .Values.provider.infraenv.ntpServers }}
