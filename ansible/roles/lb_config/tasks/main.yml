@@ -1,0 +1,208 @@
+---
+- name: register vip facts on loadbalancer hosts
+  ansible.builtin.set_fact:
+    external_api_vip: "{{ hostvars['localhost']['external_api_vip'] | default(omit) }}"
+    internal_api_vip: "{{ hostvars['localhost']['internal_api_vip'] | default(omit) }}"
+    external_ingress_vip: "{{ hostvars['localhost']['external_ingress_vip'] | default(omit) }}"
+    internal_ingress_vip: "{{ hostvars['localhost']['internal_ingress_vip'] | default(omit) }}"
+
+- name: handle external shared frontend config
+  block:
+    - name: ensure api acl
+      ansible.builtin.lineinfile:
+        path: /etc/haproxy/haproxy.cfg
+        search_string: "use_backend be-{{ cluster_name }}-api if { req_ssl_sni -i api.{{ cluster_name}}.{{ base_domain}} }"
+        line: "    use_backend be-{{ cluster_name }}-api if { req_ssl_sni -i api.{{ cluster_name}}.{{ base_domain}} }"
+        insertbefore: "default_backend be-ocp-api"
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+      when: loadbalancer_type == "external" or expose_internal_loadbalancers == true
+
+    - name: ensure api-int acl when not using internal LB
+      ansible.builtin.lineinfile:
+        path: /etc/haproxy/haproxy.cfg
+        search_string: "use_backend be-{{ cluster_name }}-api if { req_ssl_sni -i api-int.{{ cluster_name}}.{{ base_domain}} }"
+        line: "    use_backend be-{{ cluster_name }}-api if { req_ssl_sni -i api-int.{{ cluster_name}}.{{ base_domain}} }"
+        insertbefore: "default_backend be-ocp-api"
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+      when: loadbalancer_type == "external"
+
+    - name: ensure machineapi acl when not using internal LB
+      ansible.builtin.lineinfile:
+        path: /etc/haproxy/haproxy.cfg
+        search_string: "use_backend be-{{ cluster_name }}-machineapi if { req_ssl_sni -m end {{ cluster_name}}.{{ base_domain}} }"
+        line: "    use_backend be-{{ cluster_name }}-machineapi if { req_ssl_sni -m end {{ cluster_name}}.{{ base_domain}} }"
+        insertbefore: "default_backend be-ocp5-machineapi"
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+      when: loadbalancer_type == "external"
+
+    - name: ensure ingress https acl
+      ansible.builtin.lineinfile:
+        path: /etc/haproxy/haproxy.cfg
+        search_string: "use_backend be-{{ cluster_name }}-https if { req_ssl_sni -m end apps.{{ cluster_name}}.{{ base_domain}} }"
+        line: "    use_backend be-{{ cluster_name }}-https if { req_ssl_sni -m end apps.{{ cluster_name}}.{{ base_domain}} }"
+        insertbefore: '^.*default_backend be-ocp-https$'
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+      when: loadbalancer_type == "external" or expose_internal_loadbalancers == true
+
+    - name: ensure ingress http acl
+      ansible.builtin.lineinfile:
+        path: /etc/haproxy/haproxy.cfg
+        search_string: "use_backend be-{{ cluster_name }}-http if { hdr_sub(host) -i {{ cluster_name}}.{{ base_domain}} }"
+        line: "    use_backend be-{{ cluster_name }}-http if { hdr_sub(host) -i {{ cluster_name}}.{{ base_domain}} }"
+        insertbefore: '^.*default_backend be-ocp-http$'
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+      when: loadbalancer_type == "external" or expose_internal_loadbalancers == true
+
+  when: loadbalancer_frontend_mode == "shared"
+
+- name: handle dedicated frontend config
+  block:
+    - name: ensure api frontend
+      ansible.builtin.blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        marker: '# {mark} {{ cluster_name|upper }} API FRONTEND'
+        block: |
+          frontend fe-{{ cluster_name }}-api
+              bind {{ external_api_vip }}:6443
+              timeout client 10m
+              tcp-request inspect-delay 5s
+              tcp-request content accept if { req_ssl_hello_type 1 }
+              mode tcp
+              option tcplog
+              default_backend be-{{ cluster_name }}-api
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+
+    - name: ensure machineapi frontend
+      ansible.builtin.blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        marker: '# {mark} {{ cluster_name|upper }} MACHINEAPI FRONTEND'
+        block: |
+          frontend fe-{{ cluster_name }}-api
+              bind {{ external_api_vip }}:22623
+              timeout client 10m
+              tcp-request inspect-delay 5s
+              tcp-request content accept if { req_ssl_hello_type 1 }
+              mode tcp
+              option tcplog
+              default_backend be-{{ cluster_name }}-machineapi
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+
+    - name: ensure http frontend
+      ansible.builtin.blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        marker: '# {mark} {{ cluster_name|upper }} HTTP FRONTEND'
+        block: |
+          frontend fe-{{ cluster_name }}-http
+              bind {{ external_ingress_vip }}:80
+              default_backend be-{{ cluster_name }}-http
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+
+    - name: ensure https frontend
+      ansible.builtin.blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        marker: '# {mark} {{ cluster_name|upper }} HTTPS FRONTEND'
+        block: |
+          frontend fe-{{ cluster_name }}-https
+              bind {{ external_ingress_vip }}:443
+              timeout client 10m
+              tcp-request inspect-delay 5s
+              tcp-request content accept if { req_ssl_hello_type 1 }
+              mode tcp
+              option tcplog
+              default_backend be-{{ cluster_name }}-https
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+
+    - name: add loopback interface IP addresses
+      ansible.builtin.command:
+        cmd: "/sbin/ip addr add {{ item }}/32 dev lo"
+      when:
+        - cluster_state == 'present'
+        - item not in ansible_lo['ipv4'] | map('address')
+
+    - name: remove loopback interface IP addresses
+      ansible.builtin.command:
+        cmd: "/sbin/ip addr del {{ item }}/32 dev lo"
+      when:
+        - cluster_state == 'absent'
+        - item in ansible_lo['ipv4'] | map('address')
+
+  when: loadbalancer_frontend_mode == "dedicated"
+
+- name: handle backend definitions
+  block:
+    - name: handle api backend for external LB
+      ansible.builtin.blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        marker: '# {mark} {{ cluster_name|upper }} API BACKEND'
+        block: |
+          backend be-{{ cluster_name }}-api
+              mode tcp
+              timeout server 10m
+              {% for host in cluster_hosts.get('control-plane', []) %}
+              server {{ host.name }} {{ host.ip_address }}:6443 check
+              {% endfor %}
+          backend be-{{ cluster_name }}-machineapi
+              mode tcp
+              timeout server 10m
+              {% for host in cluster_hosts.get('control-plane', []) %}
+              server {{ host.name }} {{ host.ip_address }}:22623 check
+              {% endfor %}
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+      when: loadbalancer_type == "external"
+
+    - name: handle api backend for exposed internal LB
+      ansible.builtin.blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        marker: '# {mark} {{ cluster_name|upper }} API BACKEND'
+        block: |
+          backend be-{{ cluster_name }}-api
+              mode tcp
+              timeout server 10m
+              server {{ cluster_name }}-vip {{ internal_api_vip }}:6443 check
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+      when: loadbalancer_type == "internal" and expose_internal_loadbalancers == true
+
+    - name: handle ingress backends for external LB
+      ansible.builtin.blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        marker: '# {mark} {{ cluster_name|upper }} INGRESS BACKEND'
+        block: |
+          backend be-{{ cluster_name }}-https
+              mode tcp
+              {% for host in cluster_hosts.get('worker', []) %}
+              server {{ host.name }} {{ host.ip_address }}:443 check
+              {% endfor %}
+
+          backend be-{{ cluster_name }}-http
+              {% for host in cluster_hosts.get('worker', []) %}
+              server {{ host.name }} {{ host.ip_address }}:80 check
+              {% endfor %}
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+      when: loadbalancer_type == "external"
+
+    - name: handle ingress backends for exposed internal LB
+      ansible.builtin.blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        marker: '# {mark} {{ cluster_name|upper }} INGRESS BACKEND'
+        block: |
+          backend be-{{ cluster_name }}-https
+              mode tcp
+              server {{ cluster_name }}-vip {{ internal_api_vip }}:443 check
+
+          backend be-{{ cluster_name }}-http
+              server {{ cluster_name }}-vip {{ internal_api_vip }}:80 check
+        state: "{{ cluster_state }}"
+      notify: "reload haproxy"
+      when: loadbalancer_type == "internal" and expose_internal_loadbalancers == true

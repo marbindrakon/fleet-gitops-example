@@ -1,5 +1,7 @@
 - name: handle internal records
   freeipa.ansible_freeipa.ipadnsrecord:
+    ipaadmin_principal: "{{ ipaadmin_principal }}"
+    ipaadmin_password: "{{ ipaadmin_password | default(omit) }}"
     state: "{{ cluster_state }}"
     zone_name: "{{ base_domain }}"
     name: "{{ item[0] }}"
@@ -11,6 +13,8 @@
 
 - name: handle external records
   freeipa.ansible_freeipa.ipadnsrecord:
+    ipaadmin_principal: "{{ ipaadmin_principal }}"
+    ipaadmin_password: "{{ ipaadmin_password | default(omit) }}"
     state: "{{ cluster_state }}"
     zone_name: "{{ base_domain }}"
     name: "{{ item[0] }}"

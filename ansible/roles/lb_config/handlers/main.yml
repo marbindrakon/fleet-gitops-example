@@ -1,0 +1,6 @@
+---
+- name: reload haproxy
+  ansible.builtin.systemd:
+    name: haproxy.service
+    state: reloaded
+  become: true
