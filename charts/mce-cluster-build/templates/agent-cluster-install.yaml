@@ -9,7 +9,6 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: '1'
 spec:
-  holdInstallation: false
   clusterDeploymentRef:
     name: {{ .Values.cluster.name }}
   imageSetRef:
