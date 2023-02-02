@@ -132,16 +132,16 @@ platform_configs:
     glance_image: rhcos-4.12.0
     cluster_sizes:
       sandbox:
-        controller_count: 1
-        worker_count: 0
+        controller_count: 3
+        worker_count: 3
         worker_flavor: m1.large
-        controller_flavor: m1.2xlarge
+        controller_flavor: m5.xlarge
         gpu_flavor: g1.2xlarge
       small:
         controller_count: 3
         worker_count: 3
-        controller_flavor: m1.xlarge
-        worker_flavor: m1.large
+        controller_flavor: m5.xlarge
+        worker_flavor: m5.xlarge
         gpu_flavor: g1.large
       medium:
         controller_count: 3
