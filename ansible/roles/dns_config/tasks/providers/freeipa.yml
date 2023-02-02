@@ -10,6 +10,7 @@
     record_ttl: 1200
   loop: "{{ dns_internal_records }}"
   when: (not dns_split_horizon|bool) or dns_provider.value.split_horizon_internal|bool
+  delegate_to: "{{ groups['ipaservers'][0] }}"
 
 - name: handle external records
   freeipa.ansible_freeipa.ipadnsrecord:
@@ -23,3 +24,4 @@
     record_ttl: 1200
   loop: "{{ dns_external_records }}"
   when: dns_split_horizon|bool and (not dns_provider.value.split_horizon_internal|bool)
+  delegate_to: "{{ groups['ipaservers'][0] }}"
