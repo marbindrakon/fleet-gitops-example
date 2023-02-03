@@ -10,3 +10,4 @@ collections:
     version: delete_function
   - name: amazon.aws
   - name: openstack.cloud
+  - name: servicenow.itsm

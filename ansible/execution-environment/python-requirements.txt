@@ -2,4 +2,7 @@ kubernetes==25.3.0
 python-hpilo==4.4.3
 pynetbox==7.0.0
 hvac==1.0.2
-openstackclient==4.0.2
+openstackclient==4.0.0
+pyOpenSSL==21.0.0
+cryptography==37.0.2
+pysnow==0.7.17
