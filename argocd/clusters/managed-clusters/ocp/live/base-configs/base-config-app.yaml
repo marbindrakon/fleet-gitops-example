@@ -19,39 +19,5 @@ spec:
     path: "charts/ocp-base-config"
     targetRevision: HEAD
     helm:
-      values: |
-        cluster:
-          name: ocp
-          baseDomain: lab.signal9.gg
-          gitOpsBasePath: argocd/clusters/managed-clusters
-        monitoring:
-          enabled: true
-          storageClass: standard-csi
-        externalSecrets:
-          vaultAuthPath: 'k8s-ocp'
-        timesync:
-          enabled: true
-          ptp:
-            enabled: false
-            loadKvmModule: false
-          ntpServers:
-            - 172.18.0.79
-            - 172.18.42.10
-            - 172.18.42.11
-        certManager:
-          solvers:
-            - http01:
-                ingress: {}
-            - dns01:
-                route53:
-                  # Required prior to 1.9 when this can be moved to a 
-                  # secret and pulled from vault like the secret key
-                  accessKeyID: AKIAR3Z7ELN7VLNNHZHZ
-                  region: us-east-1
-                  secretAccessKeySecretRef:
-                    key: secret-access-key
-                    name: route53-key
-              selector:
-                dnsZones:
-                  - signal9.gg
-                  - lab.signal9.gg
+      valueFiles:
+        - "../../argocd/clusters/managed-clusters/ocp/helm-values/base-config-values.yaml"
