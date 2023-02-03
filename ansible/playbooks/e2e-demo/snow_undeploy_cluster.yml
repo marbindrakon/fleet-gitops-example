@@ -17,6 +17,11 @@
         cluster_state: unchanged
       when: cluster_protected == true
 
+    - name: wait 30 seconds
+      ansible.builtin.pause:
+        seconds: 30
+      when: cluster_protected == true
+
 - name: run cluster undeploy
   ansible.builtin.import_playbook: ../undeploy_cluster.yml
 

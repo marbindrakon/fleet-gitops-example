@@ -1,0 +1,16 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    cluster_state: unchanged
+    gitops_task: unprotect
+  tasks:
+    - name: include gitops_cluster_build role
+      ansible.builtin.include_role:
+        name: gitops_cluster_build
+
+    - name: wait 30 seconds
+      ansible.builtin.pause:
+        seconds: 30
+
+- name: include undeploy plays
+  ansible.builtin.import_playbook: undeploy_cluster.yml
