@@ -1,0 +1,40 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: update status in SNOW
+      servicenow.itsm.api:
+        resource: "{{ service_now['cluster_info_table'] }}"
+        action: patch
+        sys_id: "{{ snow_record_id }}"
+        data:
+          status: "Deprovisioning"
+
+    - name: unprotect cluster since approval happened in SNOW
+      ansible.builtin.include_role:
+        name: gitops_cluster_build
+      vars:
+        gitops_task: unprotect
+        cluster_state: unchanged
+      when: cluster_protected == true
+
+- name: run cluster undeploy
+  ansible.builtin.import_playbook: ../undeploy_cluster.yml
+
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: wait up to one hour for cluster namespace to disappear
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Namespace
+        name: "{{ cluster_name }}"
+      register: undeploy_ns_list
+      until: undeploy_ns_list.resources | length == 0
+      retries: 120
+      delay: 30
+
+    - name: delete cluster record in SNOW
+      servicenow.itsm.api:
+        resource: "{{ service_now['cluster_info_table'] }}"
+        action: delete
+        sys_id: "{{ snow_record_id }}"

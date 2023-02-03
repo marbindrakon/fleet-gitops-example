@@ -42,7 +42,7 @@
   ansible.builtin.template:
     src: "{{ cluster_platform }}-build-values.yaml.j2"
     dest: "{{ gitops_temp_dir.path }}/argocd/clusters/managed-clusters/{{ cluster_name }}/helm-values/build-values.yaml"
-  when: cluster_state == "present"
+  when: cluster_state == "present" or gitops_task == "unprotect"
 
 - name: template base config
   ansible.builtin.template:

@@ -1,0 +1,56 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: auto platform - set platform based for gpu
+      ansible.builtin.set_fact:
+        cluster_platform: openstack
+      when: snow_cluster_platform == "auto" and cluster_special_feature == "gpu"
+
+    - name: auto platform - set platform based for virt
+      ansible.builtin.set_fact:
+        cluster_platform: infra_env_hybrid
+      when: snow_cluster_platform == "auto" and cluster_special_feature == "virtualization"
+
+    - name: auto platform - default to openstack
+      ansible.builtin.set_fact:
+        cluster_platform: openstack
+      when: snow_cluster_platform == "auto" and cluster_special_feature not in ["gpu", "virtualization"]
+
+    - name: set cluster_platform based on non-auto snow_cluster_platform
+      ansible.builtin.set_fact:
+        cluster_platform: "{{ snow_cluster_platform }}"
+      when: snow_cluster_platform != "auto"
+
+    - name: update platform in SNOW
+      servicenow.itsm.api:
+        resource: "{{ service_now['cluster_info_table'] }}"
+        action: patch
+        sys_id: "{{ snow_record_id }}"
+        data:
+          platform: "{{ cluster_platform }}"
+
+- name: run cluster deployment
+  ansible.builtin.import_playbook: ../deploy_cluster.yml
+
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: wait up to one hour for ManagedClusterAvailable
+      kubernetes.core.k8s_info:
+        api_version: cluster.open-cluster-management.io/v1
+        kind: ManagedCluster
+        name: "{{ cluster_name }}"
+        wait_condition:
+          type: ManagedClusterAvailable
+        wait: true
+        wait_sleep: 45
+        wait_timeout: 3600
+
+    - name: update cluster status and console url in SNOW
+      servicenow.itsm.api:
+        resource: "{{ service_now['cluster_info_table'] }}"
+        action: patch
+        sys_id: "{{ snow_record_id }}"
+        data:
+          status: "Running"
+          console_url: "https://console-openshift-console.apps.{{ cluster_name }}.{{ base_domain }}"
