@@ -125,6 +125,9 @@ cluster_sso:
   client_realm: "Signal9-RHT"
   console_sso_label: "Signal9-RHT"
 
+service_now:
+  cluster_info_table: x_956379_opensnax_cluster_requests
+
 platform_configs:
   openstack:
     vip_network: lab-net
