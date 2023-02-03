@@ -76,13 +76,13 @@ provider:
             - name: bond0
               type: bond
               state: up
-              port:
-                - eno1
-                - eno2
               link-aggregation:
                 mode: active-backup
                 options:
                   miimon: '100'
+                port:
+                  - eno1
+                  - eno2
               ipv4:
                 enabled: true
                 address:
@@ -94,13 +94,14 @@ provider:
             - name: bond1
               type: bond
               state: up
-              port:
-                - eno3
-                - eno3d1
+              mtu: 9000
               link-aggregation:
                 mode: active-backup
                 options:
                   miimon: '100'
+                port:
+                  - eno3
+                  - eno3d1
               ipv4:
                 enabled: false
                 dhcp: false
@@ -109,6 +110,7 @@ provider:
             - name: bond1.19
               type: vlan
               state: up
+              mtu: 9000
               ipv4:
                 dhcp: false
                 enabled: true
@@ -128,11 +130,9 @@ provider:
               - destination: 0.0.0.0/0
                 next-hop-address: 172.18.16.1
                 next-hop-interface: bond0
-                table-id: 254
               - destination: 172.18.14.0/24
                 next-hop-address: 172.18.19.1
                 next-hop-interface: bond1.19
-                table-id: 254
         interfaces:
           - name: eno1
             macAddress: 2c:41:38:eb:da:18
