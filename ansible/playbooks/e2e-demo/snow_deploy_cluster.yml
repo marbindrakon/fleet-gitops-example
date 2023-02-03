@@ -41,7 +41,9 @@
         kind: ManagedCluster
         name: "{{ cluster_name }}"
         wait_condition:
-          type: ManagedClusterAvailable
+          type: ManagedClusterConditionAvailable
+          status: "True"
+          reason: "ManagedClusterAvailable"
         wait: true
         wait_sleep: 45
         wait_timeout: 3600
