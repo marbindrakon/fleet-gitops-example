@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: {{ cluster_name }}-deploy
   namespace: openshift-gitops
-{% if cluster_protected == False %}
+{% if cluster_protected == False or gitops_task == "unprotect" %}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 {% endif %}
