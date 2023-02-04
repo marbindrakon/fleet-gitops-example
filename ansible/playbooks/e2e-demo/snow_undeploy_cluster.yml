@@ -34,7 +34,7 @@
         kind: Namespace
         name: "{{ cluster_name }}"
       register: undeploy_ns_list
-      until: undeploy_ns_list | length == 0
+      until: undeploy_ns_list.resources is defined and undeploy_ns_list.resources | length == 0
       retries: 120
       delay: 30
 
