@@ -11,3 +11,11 @@ rules:
     resources:
       - managedclusters
 
+  - verbs:
+      - get
+      - list
+    apiGroups:
+      - ''
+    resources:
+      - namespaces
+
