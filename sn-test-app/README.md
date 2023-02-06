@@ -1,3 +1,8 @@
+# ServiceNow Test Application
+This is an example application created in ServiceNow App Engine Studio to trigger OpenShift cluster
+builds via Ansible Automation Platform. It should not be considered more than a proof-of-concept nor used in any
+non-development environment.
+
 # Generated files
 This repository contains generated files and a checksum.
 
