@@ -1,0 +1,9 @@
+[allowlist]
+  description = "Global Allowlist"
+
+  # Ignore based on any subset of the file path
+  paths = [
+    # Ignore revoked oauth data from servicenow app export used as test data
+    '''\/oauth_entity_a685e6952f306110d3fc4ae72799b65a.xml''',
+    '''\/oauth_entity_ab0436892fb02110d3fc4ae72799b6d9.xml''',
+  ]
