@@ -14,5 +14,5 @@ spec:
     protocol: TCP
     name: ssh
   selector:
-    app: test-vm
+    vm.kubevirt.io/name: "test-vm"
   type: LoadBalancer
