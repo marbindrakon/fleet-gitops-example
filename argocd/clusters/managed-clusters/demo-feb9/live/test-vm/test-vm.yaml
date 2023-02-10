@@ -90,4 +90,4 @@ spec:
             user: cloud-user
             ssh_authorized_keys:
               - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCg+4j4gUEdpCLLNra0QiXUPcyAcuf3R8bL9s9MabN4sWTemUYzCUURs2zfa6mG2Fkl1rWhJCoiJ8OqXmjJ6dF/MrD95UghECB4IijQDbREBnNk5xRoDkTVrYzJedEAZJzQVZPwgfuECLDseVGJr+muinI9iun2xO2o0+urIPZ6qnP37TezhCdq4lhKDE03pD7lubBcjsrcG9LaH2CRJmS4z/lJ6fDYdjdYI0lWukqZ7FSN4GYUDNZ2EnAqVGCoWYx04B4kzDzt9SWmsf9hlrvF/jdS4ZNYefa2WiTM8MqNRp97aqyBBB8pL1K5lfCfgIzXst8GVb8irFbUxKgQXqx9
-        name: cloudinitdis
+        name: cloudinitdisk
