@@ -30,7 +30,7 @@ spec:
     spec:
       source:
         registry:
-          imageStream: rhel9-guest
+          url: image-registry.openshift-image-registry.svc:5000/openshift-virtualization-os-images/rhel9-guest:latest
           pullMethod: node
       storage:
         resources:
