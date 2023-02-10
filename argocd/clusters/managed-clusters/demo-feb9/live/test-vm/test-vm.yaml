@@ -28,10 +28,10 @@ spec:
     metadata:
       name: test-vm
     spec:
-      sourceRef:
-        kind: DataSource
-        name: rhel9
-        namespace: openshift-virtualization-os-images
+      source:
+        registry:
+          imageStream: rhel9-guest
+          pullMethod: node
       storage:
         resources:
           requests:
