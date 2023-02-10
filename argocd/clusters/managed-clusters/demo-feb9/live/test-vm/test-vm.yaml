@@ -36,6 +36,9 @@ spec:
         resources:
           requests:
             storage: 50Gi
+        accessModes:
+          - ReadWriteOnce
+        volumeMode: Filesystem
   running: true
   template:
     metadata:
