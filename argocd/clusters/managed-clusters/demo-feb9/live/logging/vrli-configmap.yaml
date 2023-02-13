@@ -10,7 +10,7 @@ data:
       port 24224
       bind 0.0.0.0
     </source>
-    <filter ocp.cluster>
+    <filter **>
       @type record_transformer
       <record>
         ocp_cluster demo-feb9
