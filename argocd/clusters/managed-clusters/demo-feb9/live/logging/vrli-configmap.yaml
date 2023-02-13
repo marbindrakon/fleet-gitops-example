@@ -25,5 +25,6 @@ data:
       http_conn_debug false
       <inject>
         hostname demo-feb9.lab.signal9.gg
+        hostname_key ocp_cluster
       </inject>
     </match>
