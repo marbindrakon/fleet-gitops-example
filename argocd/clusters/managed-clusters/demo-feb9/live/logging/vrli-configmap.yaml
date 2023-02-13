@@ -10,6 +10,12 @@ data:
       port 24224
       bind 0.0.0.0
     </source>
+    <filter ocp.cluster>
+      @type record_transformer
+      <record>
+        ocp_cluster demo-feb9
+      </record>
+    </filter>
     <match **>
       @type vmware_loginsight
       scheme https
@@ -23,8 +29,4 @@ data:
       include_tag_key true
       tag_key tag
       http_conn_debug false
-      <inject>
-        hostname demo-feb9.lab.signal9.gg
-        hostname_key ocp_cluster
-      </inject>
     </match>
