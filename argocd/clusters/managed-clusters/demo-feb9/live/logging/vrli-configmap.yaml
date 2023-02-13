@@ -23,4 +23,7 @@ data:
       include_tag_key true
       tag_key tag
       http_conn_debug false
+      <inject>
+        hostname demo-feb9.lab.signal9.gg
+      </inject>
     </match>
