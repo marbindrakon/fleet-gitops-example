@@ -8,9 +8,6 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   outputs:
-  - name: remote-loki
-    type: loki
-    url: http://172.18.18.12:3100
   - name: vrli-fluentd
     type: fluentdForward
     url: 'tcp://fluentd-loginsight-logging.vmware-system-vrli.svc.cluster.local:24224'
@@ -21,5 +18,4 @@ spec:
     - audit
     name: forward-to-remote
     outputRefs:
-    - remote-loki
     - vrli-fluentd
