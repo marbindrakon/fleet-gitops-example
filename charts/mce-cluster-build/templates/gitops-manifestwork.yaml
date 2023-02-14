@@ -38,7 +38,7 @@ spec:
         spec:
           generators:
           - git:
-              repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+              repoURL: "{{ .Values.cluster.gitOpsRepo }}"
               revision: HEAD
               directories:
               - path: argocd/clusters/managed-clusters/{{ .Values.cluster.name }}/live/base-configs
@@ -53,7 +53,7 @@ spec:
                 namespace: openshift-gitops
                 server: "https://kubernetes.default.svc"
               source:
-                repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+                repoURL: "{{ .Values.cluster.gitOpsRepo }}"
                 targetRevision: HEAD
                 path: '{{ "{{ path }}" }}'
 {{ end }}

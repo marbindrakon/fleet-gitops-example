@@ -1,6 +1,7 @@
 cluster:
   name: ocp4
   baseDomain: lab.signal9.gg
+  gitOpsRepo: https://github.com/marbindrakon/rhte-2023-fleet-gitops.git
   importToHub: true
   createGitopsManifestWorks: false
   useACM: false
