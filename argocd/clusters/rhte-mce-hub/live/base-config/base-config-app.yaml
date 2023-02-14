@@ -18,6 +18,7 @@ spec:
       values: |
         cluster:
           name: rhte-mce-hub
+          gitOpsRepo: "https://github.com/marbindrakon/signal9-lab-gitops.git"
           baseDomain: lab.signal9.gg
         monitoring:
           enabled: false

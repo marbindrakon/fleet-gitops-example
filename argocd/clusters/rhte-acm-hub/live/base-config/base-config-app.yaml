@@ -19,6 +19,7 @@ spec:
         cluster:
           name: rhte-acm-hub
           baseDomain: lab.signal9.gg
+          gitOpsRepo: "https://github.com/marbindrakon/signal9-lab-gitops.git"
           trustedCABundle: |
             -----BEGIN CERTIFICATE-----
             MIICkTCCAhagAwIBAgIUX1Cm8VWt4ki4+8XH7oKsYYKJM+QwCgYIKoZIzj0EAwIw
