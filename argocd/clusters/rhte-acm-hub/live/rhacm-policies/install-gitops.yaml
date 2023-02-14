@@ -91,7 +91,7 @@ spec:
                 spec:
                   generators:
                   - git:
-                      repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+                      repoURL: "https://github.com/marbindrakon/signal9-lab-gitops.git"
                       revision: HEAD
                       directories:
                       - path: argocd/clusters/managed-clusters/{{hub .ManagedClusterName hub}}/live/base-configs
@@ -106,7 +106,7 @@ spec:
                         namespace: openshift-gitops
                         server: "https://kubernetes.default.svc"
                       source:
-                        repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+                        repoURL: "https://github.com/marbindrakon/signal9-lab-gitops.git"
                         targetRevision: HEAD
                         path: '{{ "{{ path }}" }}'
 ---

@@ -11,7 +11,7 @@ spec:
   syncPolicy:
     automated: {}
   source:
-    repoURL: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+    repoURL: "https://github.com/marbindrakon/signal9-lab-gitops.git"
     path: "charts/ocp-base-config"
     targetRevision: HEAD
     helm:

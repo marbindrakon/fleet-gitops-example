@@ -1,7 +1,7 @@
 cluster:
   name: "aaustin-sandbox"
   baseDomain: "lab.signal9.gg"
-  gitOpsRepo: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+  gitOpsRepo: "https://github.com/marbindrakon/signal9-lab-gitops.git"
   gitOpsBasePath: argocd/clusters/managed-clusters
 
 monitoring:
