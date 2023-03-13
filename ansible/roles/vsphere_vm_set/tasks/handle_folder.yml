@@ -1,0 +1,33 @@
+- name: ensure folder exists (without parent)
+  community.vmware.vcenter_folder:
+    folder_type: vm
+    folder_name: "{{ vm_folder }}"
+    datacenter: "{{ vm_datacenter }}"
+    state: present
+  when: cluster_state == "present" and vm_folder|split('/')|length == 1
+
+- name: ensure folder exists (with parent)
+  community.vmware.vcenter_folder:
+    folder_type: vm
+    folder_name: "{{ vm_folder|split('/')|last }}"
+    parent_folder: "{{ (vm_folder|split('/'))[:-1] }}"
+    datacenter: "{{ vm_datacenter }}"
+    state: present
+  when: cluster_state == "present" and vm_folder|split('/')|length > 1
+
+- name: ensure folder is absent (without parent)
+  community.vmware.vcenter_folder:
+    folder_type: vm
+    folder_name: "{{ vm_folder }}"
+    datacenter: "{{ vm_datacenter }}"
+    state: absent
+  when: cluster_state == "absent" and vm_folder|split('/')|length == 1
+
+- name: ensure folder is absent (with parent)
+  community.vmware.vcenter_folder:
+    folder_type: vm
+    folder_name: "{{ vm_folder|split('/')|last }}"
+    parent_folder: "{{ (vm_folder|split('/'))[:-1] }}"
+    datacenter: "{{ vm_datacenter }}"
+    state: absent
+  when: cluster_state == "absent" and vm_folder|split('/')|length > 1

@@ -1,0 +1,106 @@
+---
+# defaults file for vsphere_vm_set
+
+# allowed_placements should be a list of dictionaries where each list entry is
+# an ESXi cluster, the allowed datastores for that cluster, and the resource pool to use.
+#
+# Datastores can be defined as a static list of datastore names and/or a
+# datastore_match string that will be checked against all datastores in the
+# virtual datacenter. If both are defined, the result will be the
+# combined list of static and matched datastores.
+#
+# The resource pool is defined by resource_pool_match which is a substring that
+# will be checked against resource pools in the cluster. If multiple pools match,
+# the first one returned by the vSphere API will be used.
+#
+# allowed_placements:
+#   - cluster: CLUSTER-1
+#     datastores:
+#       - DS1
+#       - DS2
+#     resource_pool_match: Resources
+#   - cluster: CLUSTER-2
+#     datastore_match: CLUSTER-2-SAN
+#     resource_pool_match: OPENSHIFT-CTRL-PLANE
+#
+allowed_placements: []
+
+# A format string that defines the template used for the VM name
+# In this example, all VMs will be named ansible-vm42XXX where XXX is
+# an incrementing index value left-padded to three digits. The role will
+# discover the highest existing index value in use within the vCenter and begin
+# incrementing from there for new VMs.
+#
+# Deleted VM names will not be re-used currently.
+vm_name_format: "ansible-vm42%03d"
+
+# The vm_scheduler module determines how VMs are allocated across the clusters
+# from the allowed_placements dictionary.
+vm_scheduler: random
+
+# The datastore_scheduler module determines how VMs are allocated across
+# the datastores available within a cluster. All VM disks will always be placed
+# on the same datastore.
+datastore_scheduler: random
+
+# Clusters and datastores that cannot accept the new virtual machine within
+# the ratios below will be excluded from scheduling.
+cpu_commit_ratio: 1.5
+ram_commit_ratio: 1.0
+datastore_commit_ratio: 1.0
+
+# The number of identical virtual machines to be created in the VM set
+vm_count: 1
+
+# The name of the VM set. This will be used in a tag for tracking which VMs belong
+# to the VM set.
+vm_set_name: ""
+
+# If set to true, an anti-affnity rule will be created for any VMs in the set
+# that land on the same ESXi cluster
+vm_set_anti_affinity: false
+
+# Hardware settings for created virtual machines, excluding disks and NICs handled
+# separately
+vm_hardware: {}
+vm_hardware_defaults:
+  hardware_version: 19
+  num_cpus: 2
+  memory_mb: 4096
+  guest_id: centos9_64Guest
+  cdroms:
+    - controller_type: sata
+      controller_number: 0
+      unit_number: 0
+      type: none
+
+vm_disk_type: paravirtual
+vm_disks:
+  - size_gb: 50
+
+vm_nics:
+  - type: vmxnet3
+    portgroup_name: 'VM Network'
+
+vm_datacenter: ""
+
+vm_folder: ""
+# Delete the VM folder when the VM set is removed. This should only be set
+# when the VM set has a dedicated folder to prevent accidental deletions
+# of other VMs.
+vm_folder_cleanup: false
+
+# Dictonary of additional custom attributes to apply to each VM.
+vm_extra_attributes: {}
+
+# The attribute name to use for tracking which VMs are owned by an ansible VM set.
+vm_set_attribute: "ansible_vm_set_name"
+
+# Which VM names should be deleted in a scale-down operation
+vm_set_scale_down_names: []
+
+# If vm_set_allow_scale_down_without_names is set to true, then a random
+# selection of VMs will be deleted on scale down. If set to false, an error
+# will be thrown if scale down is attempted without passing in a list of
+# VM names.
+vm_set_allow_scale_down_without_names: false

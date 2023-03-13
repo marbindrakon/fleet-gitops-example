@@ -1,0 +1,39 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    cluster_state: absent
+    vm_datacenter: XNA
+    vm_folder: "Ansible-Testing"
+    vm_folder_cleanup: true
+  tasks:
+    - name: include vsphere_vm_set - single cluster
+      ansible.builtin.include_role:
+        name: vsphere_vm_set
+      vars:
+        allowed_placements:
+          - cluster: XNA-ESX-1
+            datastores:
+              - CEPH-NVME
+            resource_pool_match: Resources
+        vm_count: 3
+        vm_set_name: single_cluster_test
+        vm_set_anti_affinity: true
+        vm_set_state: "{{ cluster_state }}"
+
+    - name: include vsphere_vm_set - multi cluster
+      ansible.builtin.include_role:
+        name: vsphere_vm_set
+      vars:
+        allowed_placements:
+          - cluster: XNA-TEMP-1
+            datastore_match:
+              - XNA-TEMP-1
+            resource_pool_match: NO-BACKUP
+          - cluster: XNA-TEMP-2
+            datastore_match:
+              - XNA-TEMP-2
+            resource_pool_match: XNA-TEMP-2-BACKUP
+        vm_count: 3
+        vm_set_name: single_cluster_test
+        vm_set_anti_affinity: true
+        vm_set_state: "{{ cluster_state }}"

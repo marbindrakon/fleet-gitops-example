@@ -1,0 +1,17 @@
+- name: query virtual machines from vcenter
+  community.vmware.vmware_vm_info:
+    folder: "/{{ vm_datacenter }}/vm/{{ vm_folder }}"
+    show_attribute: true
+  register: full_vm_list
+
+- name: store json query for vm set filter
+  set_fact:
+    vm_set_json_query: "attributes[?{{ vm_set_attribute }}=='{{ vm_set_name }}']"
+
+- name: debug vm list
+  ansible.builtin.debug:
+    msg: "{{ full_vm_list.virtual_machines | to_json | from_json | community.general.json_query(vm_set_json_query) }}"
+
+- name: debug vm list
+  ansible.builtin.debug:
+    msg: "{{ full_vm_list.virtual_machines }}"

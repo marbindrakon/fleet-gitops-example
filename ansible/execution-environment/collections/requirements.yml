@@ -11,3 +11,4 @@ collections:
   - name: amazon.aws
   - name: openstack.cloud
   - name: servicenow.itsm
+  - name: community.vmware
