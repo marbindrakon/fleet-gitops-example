@@ -1,0 +1,16 @@
+- name: create build spec
+  ansible.builtin.set_fact:
+    new_build_spec:
+      name: "{{ vm_name }}"
+      guest_id: "{{ vm_hardware.guest_id|default(vm_hardware_defaults.guest_id) }}"
+      hardware:
+        scsi: "{{ vm_scsi_type }}"
+        num_cpus: "{{ vm_hardware.num_cpus|default(vm_hardware_defaults.num_cpus) }}"
+        memory_mb: "{{ vm_hardware.memory_mb|default(vm_hardware_defaults.memory_mb) }}"
+        version: "{{ vm_hardware.hardware_version|default(vm_hardware_defaults.hardware_version) }}"
+      disks: "{{ vm_disks }}"
+      nics: "{{ vm_nics }}"
+
+- name: extend vm_build_specs list
+  ansible.builtin.set_fact:
+    vm_build_specs: "{{ vm_build_specs + [new_build_spec] }}"

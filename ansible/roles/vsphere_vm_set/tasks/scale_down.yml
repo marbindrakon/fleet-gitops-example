@@ -1,0 +1,32 @@
+- name: fail if attempting to scale down without names
+  ansible.builtin.fail:
+    msg: "VM set requires scale down but vm_set_scale_down_names is not set! See comments for vm_set_allow_scale_down_without_names"
+  when: cluster_state == "present" and vm_set_allow_scale_down_without_names != true and vm_set_scale_down_names|length == 0
+
+- name: determine number of vms to remove
+  ansible.builtin.set_fact:
+    vm_set_scaling_count: "{{ vm_set_output.machines | length - vm_count | int }}"
+  when: cluster_state == "present"
+
+- name: initialize list of vms to remove
+  ansible.builtin.set_fact:
+    vm_set_scale_down_targets: []
+
+- name: target all vms for cluster_state absent
+  ansible.builtin.set_fact:
+    vm_set_scale_down_targets: "{{ vm_set_output.machines }}"
+  when: cluster_state == "absent"
+
+- name: print scale down not implemented message
+  ansible.builtin.debug:
+    msg: "Scale down is not currently implemented except where cluster_state is absent"
+
+- name: delete virtual machines
+  community.vmware.vmware_guest:
+    state: absent
+    force: true
+    uuid: "{{ target_vm.vmware_uuid }}"
+  delegate_to: localhost
+  loop: "{{ vm_set_scale_down_targets }}"
+  loop_control:
+    loop_var: target_vm

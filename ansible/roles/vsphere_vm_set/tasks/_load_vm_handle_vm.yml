@@ -1,0 +1,31 @@
+- name: get vm details from api
+  community.vmware.vmware_guest_info:
+    schema: summary
+    datacenter: "{{ vm_datacenter }}"
+    moid: "{{ item.moid }}"
+  register: vm_load_api_details
+
+- name: create empty nic list
+  ansible.builtin.set_fact:
+    vm_load_nic_list: []
+
+- name: built nic list
+  ansible.builtin.set_fact:
+    vm_load_nic_list: "{{ vm_load_nic_list + [{'name': nic, 'mac': vm_load_api_details.instance.get('hw_{0}'.format(nic)).macaddress}] }}"
+  loop: "{{ vm_load_api_details.instance.hw_interfaces }}"
+  loop_control:
+    loop_var: nic
+
+- name: render vm details
+  ansible.builtin.set_fact:
+    vm_load_vm_detail_dict:
+      name: "{{ vm_load_api_details.instance.hw_name }}"
+      provider: vmware
+      moid: "{{ item.moid }}"
+      nics: "{{ vm_load_nic_list }}"
+      vmware_uuid: "{{ vm_load_api_details.instance.instance_uuid }}"
+
+- name: save vm details
+  ansible.builtin.set_fact:
+    vm_set_output:
+      machines: "{{ vm_set_output.machines + [vm_load_vm_detail_dict] }}"

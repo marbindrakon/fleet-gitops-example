@@ -1,0 +1,56 @@
+# Assemble VM build specs, call schedulers, execute builds
+
+- name: initialize initial variables for scale up
+  ansible.builtin.set_fact:
+    vm_build_specs: []
+    vm_new_names: []
+    vm_name_prefix: "{{ vm_name_format|split('%')|first }}"
+
+- name: determine number of vms to create
+  ansible.builtin.set_fact:
+    vm_set_scaling_count: "{{ vm_count - (vm_set_output.machines|length) | int }}"
+
+- name: query all existing vms
+  community.vmware.vmware_vm_info:
+    folder: "/{{ vm_datacenter }}/vm"
+  register: vm_starting_vm_list
+
+- name: get existing vm names that match our naming scheme
+  ansible.builtin.set_fact:
+    vm_filtered_existing_names: "{{ vm_starting_vm_list | to_json | from_json | community.general.json_query(json_query) }}"
+  vars:
+    json_query: "virtual_machines[?starts_with(guest_name, '{{ vm_name_prefix }}')].guest_name"
+
+- name: get list of used indexes
+  ansible.builtin.set_fact:
+    vm_used_indexes: "{{ vm_used_indexes|default([]) + [ item|split(vm_name_prefix)|last|int ] }}"
+  loop: "{{ vm_filtered_existing_names }}"
+
+- name: calculate last used index
+  ansible.builtin.set_fact:
+    vm_last_index: "{{ vm_used_indexes|default([0])|max }}"
+
+- name: get list of names to create
+  ansible.builtin.set_fact:
+    vm_new_names: "{{ vm_new_names + [ vm_name_format|format(ansible_loop.index|int + vm_last_index|int) ] }}"
+  loop: "{{ range(vm_set_scaling_count|int) }}"
+  loop_control:
+    extended: true
+    extended_allitems: false
+
+- name: populate build specs
+  ansible.builtin.include_tasks: _scale_up_create_build_spec.yml
+  loop: "{{ vm_new_names }}"
+  loop_control:
+    loop_var: vm_name
+
+- name: invoke vm scheduler
+  ansible.builtin.include_tasks: "scheduler/{{ vm_scheduler }}/vm.yml"
+
+- name: invoke datastore scheduler
+  ansible.builtin.include_tasks: "scheduler/{{ datastore_scheduler }}/datastore.yml"
+
+- name: build vm
+  ansible.builtin.debug:
+    msg: "{{ item }}"
+  loop: "{{ vm_build_specs }}"

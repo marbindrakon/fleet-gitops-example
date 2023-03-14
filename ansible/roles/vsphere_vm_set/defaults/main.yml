@@ -74,13 +74,14 @@ vm_hardware_defaults:
       unit_number: 0
       type: none
 
-vm_disk_type: paravirtual
+vm_scsi_type: paravirtual
 vm_disks:
   - size_gb: 50
+    type: thin
 
 vm_nics:
-  - type: vmxnet3
-    portgroup_name: 'VM Network'
+  - device_type: vmxnet3
+    name: 'VM Network'
 
 vm_datacenter: ""
 

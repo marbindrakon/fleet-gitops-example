@@ -1,0 +1,19 @@
+### Schedule a VM to a random cluster
+### Schedulers add the `cluster` or `datastore` field to the virtual machines
+### in the vm_build_specs list
+
+- name: get cluster list from allowed_placements
+  ansible.builtin.set_fact:
+    vm_scheduler_initial_clusters: "{{ allowed_placements | community.general.json_query(json_query) }}"
+  vars:
+    json_query: "[].cluster"
+
+- name: initial_clusters
+  ansible.builtin.debug:
+    msg: "{{ vm_scheduler_initial_clusters }}"
+
+# TODO: Filter vm_scheduler_initial_clusters to only those with enough capacity
+- name: save list of eligible clusters
+  ansible.builtin.set_fact:
+    vm_scheduler_candidate_clusters: "{{ vm_scheduler_initial_clusters }}"
+

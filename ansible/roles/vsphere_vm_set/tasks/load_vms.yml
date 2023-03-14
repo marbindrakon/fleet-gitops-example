@@ -1,17 +1,30 @@
 - name: query virtual machines from vcenter
-  community.vmware.vmware_vm_info:
-    folder: "/{{ vm_datacenter }}/vm/{{ vm_folder }}"
-    show_attribute: true
-  register: full_vm_list
+  block:
+    - name: query for folder
+      community.vmware.vmware_vm_info:
+        folder: "/{{ vm_datacenter }}/vm/{{ vm_folder }}"
+        show_attribute: true
+      register: full_vm_list
+  rescue:
+    - name: fall back to VC-wide query
+      community.vmware.vmware_vm_info:
+        folder: "/{{ vm_datacenter }}/vm"
+        show_attribute: true
+      register: full_vm_list
 
 - name: store json query for vm set filter
   set_fact:
-    vm_set_json_query: "attributes[?{{ vm_set_attribute }}=='{{ vm_set_name }}']"
+    vm_set_json_query: "virtual_machines[?attributes.{{ vm_set_attribute }}=='{{ vm_set_name }}']"
 
-- name: debug vm list
-  ansible.builtin.debug:
-    msg: "{{ full_vm_list.virtual_machines | to_json | from_json | community.general.json_query(vm_set_json_query) }}"
+- name: save matching vm list
+  ansible.builtin.set_fact:
+    vm_load_filtered_list: "{{ full_vm_list | to_json | from_json | community.general.json_query(vm_set_json_query) }}"
 
-- name: debug vm list
-  ansible.builtin.debug:
-    msg: "{{ full_vm_list.virtual_machines }}"
+- name: create details list
+  ansible.builtin.set_fact:
+    vm_load_details: []
+
+- name: query vm details
+  ansible.builtin.include_tasks: "_load_vm_handle_vm.yml"
+  loop: "{{ vm_load_filtered_list }}"
+

@@ -15,15 +15,18 @@
 - name: read existing vms for vm set
   ansible.builtin.import_tasks: load_vms.yml
 
+- name: debug vm list
+  ansible.builtin.debug:
+    msg: "{{ vm_set_output }}"
+
 - name: handle vm set scale down
   ansible.builtin.import_tasks: scale_down.yml
-  when: vm_set_output.machines|length > vm_count
+  when: cluster_state == "absent" or vm_set_output.machines|length > vm_count
 
 - name: handle vm set scale up
   ansible.builtin.import_tasks: scale_up.yml
-  when: vm_set_output.machines|length < vm_count
+  when: cluster_state == "present" and vm_set_output.machines|length < vm_count
 
 - name: handle vm folder on absent state post scaling
   ansible.builtin.import_tasks: handle_folder.yml
   when: cluster_state == "absent" and vm_folder != ""
-
