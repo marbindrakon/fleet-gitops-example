@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: openshift-cert-manager-operator
+  name: cert-manager-operator
   labels:
     openshift.io/cluster-monitoring: 'true'
   annotations:
@@ -12,7 +12,10 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: openshift-cert-manager
+  name: cert-manager
+  labels:
+    openshift.io/cluster-monitoring: 'true'
   annotations:
     argocd.argoproj.io/sync-wave: '-2'
+
 {{ end }}

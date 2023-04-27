@@ -2,9 +2,11 @@
 apiVersion: operators.coreos.com/v1alpha2
 kind: OperatorGroup
 metadata:
-  name: openshift-cert-manager-operator
-  namespace: openshift-cert-manager-operator
+  name: cert-manager-operator
+  namespace: cert-manager-operator
   annotations:
     argocd.argoproj.io/sync-wave: '-1'
-spec: {}
+spec:
+  targetNamespaces:
+    - cert-manager-operator
 {{ end }}
