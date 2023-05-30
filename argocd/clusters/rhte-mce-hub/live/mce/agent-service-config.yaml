@@ -1,7 +1,7 @@
 apiVersion: agent-install.openshift.io/v1beta1
 kind: AgentServiceConfig
 metadata:
- name: agent
+  name: agent
   annotations:
     argocd.argoproj.io/sync-wave: '3'
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
