@@ -10,4 +10,36 @@ metadata:
 spec:
   # this must be set to false when using olm
   installCRDs: false
+  webhook:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: null
+      seccompProfile:
+        type: RuntimeDefault
+  certController:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: null
+      seccompProfile:
+        type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: null
+    seccompProfile:
+      type: RuntimeDefault
 {{ end }}
