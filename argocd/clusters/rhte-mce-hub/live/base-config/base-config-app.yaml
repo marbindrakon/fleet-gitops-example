@@ -11,14 +11,14 @@ spec:
   syncPolicy:
     automated: {}
   source:
-    repoURL: "https://github.com/marbindrakon/signal9-lab-gitops.git"
+    repoURL: "https://github.com/marbindrakon/fleet-gitops-example.git"
     path: "charts/ocp-base-config"
     targetRevision: HEAD
     helm:
       values: |
         cluster:
           name: rhte-mce-hub
-          gitOpsRepo: "https://github.com/marbindrakon/signal9-lab-gitops.git"
+          gitOpsRepo: "https://github.com/marbindrakon/fleet-gitops-example.git"
           baseDomain: lab.signal9.gg
         monitoring:
           enabled: false
