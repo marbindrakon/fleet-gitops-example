@@ -76,7 +76,7 @@
 - name: set external ingress VIP based on new record
   set_fact:
     external_ingress_vip: "{{ nb_external_ingress_create.ip_address.address | ansible.netcommon.ipaddr('address') }}"
-    external_api_cidr: "{{ nb_external_api_create.ip_address.address }}"
+    external_ingress_cidr: "{{ nb_external_ingress_create.ip_address.address }}"
   when:
     - external_ingress_vip is not defined 
     - nb_external_ingress_create is defined

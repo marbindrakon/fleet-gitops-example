@@ -1,0 +1,35 @@
+cluster:
+  importToHub: true
+{% if hub_type == 'acm' %}
+  useACM: true
+  createGitopsManifestWorks: false
+{% else %}
+  createGitopsManifestWorks: true
+{% endif %}
+  name: {{ cluster_name }}
+  baseDomain: {{ base_domain }}
+  clusterImageSet: {{ cluster_image_set }}
+  controlPlaneCount: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['controller_count'] }}
+  workerCount: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['worker_count'] }}
+  apiVIP: "{{ internal_api_vip }}"
+  ingressVIP: "{{ internal_ingress_vip }}"
+  pullSecretVault: "{{ hashicorp_vault['cluster_secrets']['pull-secret'] }}"
+  trustedCAs: |
+    {{ cluster_trust_bundle | indent(4) }}
+  sshKeyVault: "{{ hashicorp_vault['cluster_secrets']['node-ssh'] }}"
+  sshPubKey: "{{ cluster_ssh_pubkey }}"
+  dnsServers: {{ cluster_dns_servers | to_json }}
+provider:
+  installConfigVault: {{ hashicorp_vault['cluster_secrets']['install-config'] }}
+  providerCredsVault: {{ hashicorp_vault['cluster_secrets']['vsphere-credentials'] }}
+  providerCAs: |
+    {{ vsphere_platform_config['platform_ca_bundle'] | indent(4) }}
+  type: vSphere
+  vsphere:
+    datacenter: {{ vsphere_platform_config['datacenter'] }}
+    cluster: {{ vsphere_platform_config['cluster'] }}
+    defaultDatastore: {{ vsphere_platform_config['datastore'] }}
+    network: {{ vsphere_platform_config['network'] }}
+    folder: {{ vsphere_platform_config['folder'] | default("null") }}
+    vcenterHost: {{ vsphere_platform_config['vcenter'] }}
+    

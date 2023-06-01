@@ -1,0 +1,59 @@
+apiVersion: v1
+metadata:
+  name: {{ cluster_name }}
+baseDomain: {{ base_domain }}
+
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  replicas: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['controller_count'] }}
+  platform:
+    vsphere:
+      cpus: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['controller_vcpu'] }}
+      coresPerSocket: 2
+      memoryMB: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['controller_ram'] }}
+      osDisk:
+        diskSizeGB: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['controller_disk'] }}
+compute:
+- hyperthreading: Enabled
+  name: worker
+  replicas: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['worker_count'] }}
+  platform:
+    vsphere:
+      cpus: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['worker_vcpu'] }}
+      coresPerSocket: 2
+      memoryMB: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['worker_ram'] }}
+      osDisk:
+        diskSizeGB: {{ vsphere_platform_config['cluster_sizes'][cluster_size]['worker_disk'] }}
+
+networking:
+  networkType: OVNKubernetes
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: {{ vsphere_platform_config['node_prefix'] }}
+  serviceNetwork:
+  - 172.30.0.0/16
+
+platform:
+  vsphere:
+    username: "{{ lookup('env', 'VMWARE_USER') }}"
+    password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+    apiVIP: {{ internal_api_vip }}
+    ingressVIP: {{ internal_ingress_vip }}
+    vCenter: {{ vsphere_platform_config['vcenter'] }}
+    diskType: {{ vsphere_platform_config['disk_type'] }}
+    datacenter: {{ vsphere_platform_config['datacenter'] }}
+    cluster: {{ vsphere_platform_config['cluster'] }}
+    defaultDatastore: {{ vsphere_platform_config['datastore'] }}
+    network: {{ vsphere_platform_config['network'] }}
+{% if vsphere_platform_config.get('folder', None) %}
+    folder: {{ vsphere_platform_config['folder'] | default("null") }}
+{% endif %}
+
+additionalTrustBundle: |
+  {{ cluster_trust_bundle | indent(2) }}
+
+pullSecret: ""
+sshKey: "{{ cluster_ssh_pubkey }}"

@@ -4,9 +4,13 @@ cluster_platform: ""
 cluster_name: ""
 # cluster_state should be present or absent
 cluster_state: present
+
 openstack_platform_config:
   # The external network where Floating IPs will be allocated
   vip_network: ""
+
+vsphere_platform_config:
+  node_prefix: ""
 
 infra_env_hybrid_config:
     # Search for baremetal nodes in Netbox will be limited to this tag

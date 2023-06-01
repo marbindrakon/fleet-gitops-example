@@ -20,7 +20,17 @@ cluster:
 provider:
   providerCredsVault: ""
   providerCAs: ""
+  # Only used for vSphere
+  installConfigVault: ""
+  # Can be OpenStack, InfraEnv, or vSphere
   type: OpenStack
+  vsphere:
+    datacenter: ""
+    cluster: ""
+    defaultDatastore: ""
+    network: ""
+    folder: null
+    vcenterHost: ""
   openstack:
     existingImage: null
     externalNetwork: ""

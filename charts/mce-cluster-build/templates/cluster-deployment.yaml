@@ -29,6 +29,21 @@ spec:
         matchLabels:
           agentclusterinstalls.extensions.hive.openshift.io/location: {{ .Values.cluster.name }}
 {{ end }}
+{{ if eq .Values.provider.type "vSphere" }}
+    vsphere:
+      certificatesSecretRef:
+        name: {{ .Values.cluster.name }}-trust
+      cluster: {{ .Values.provider.vsphere.cluster }}
+      credentialsSecretRef:
+        name: {{ .Values.cluster.name }}-provider-creds
+      datacenter: {{ .Values.provider.vsphere.datacenter }}
+      defaultDatastore: {{ .Values.provider.vsphere.defaultDatastore }}
+      network: {{ .Values.provider.vsphere.network }}
+      vCenter: {{ .Values.provider.vsphere.vcenterHost }}
+{{ if .Values.provider.vsphere.folder }}
+      folder: {{ .Values.provider.vsphere.folder }}
+{{ end }}
+{{ end }}
 {{ if eq .Values.provider.type "OpenStack" }}
     openstack:
       certificatesSecretRef:

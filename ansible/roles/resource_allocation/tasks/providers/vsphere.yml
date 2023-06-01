@@ -1,0 +1,93 @@
+- name: query existing internal VIPs
+  ansible.builtin.set_fact:
+    nb_existing_int_api_query: "{{ query('netbox.netbox.nb_lookup', 'ip-addresses', api_filter='description=' + cluster_name + '-Internal-API') | items2dict}}"
+    nb_existing_int_ingress_query: "{{ query('netbox.netbox.nb_lookup', 'ip-addresses', api_filter='description=' + cluster_name + '-Internal-Ingress') | items2dict }}"
+
+- name: set internal API VIP based on existing records
+  ansible.builtin.set_fact:
+    internal_api_vip: "{{ nb_existing_int_api_query.values() | map(attribute='address') | first | ansible.netcommon.ipaddr('address') }}"
+    internal_api_cidr: "{{ nb_existing_int_api_query.values() | map(attribute='address') | first }}"
+  when:
+    - nb_existing_int_api_query is defined 
+    - nb_existing_int_api_query | length > 0
+
+- name: set internal ingress VIP based on existing records
+  ansible.builtin.set_fact:
+    internal_ingress_vip: "{{ nb_existing_int_ingress_query.values() | map(attribute='address') | first | ansible.netcommon.ipaddr('address') }}"
+    internal_ingress_cidr: "{{ nb_existing_int_ingress_query.values() | map(attribute='address') | first }}"
+  when:
+    - nb_existing_int_ingress_query is defined 
+    - nb_existing_int_ingress_query | length > 0
+
+- name: allocate internal API VIP
+  netbox.netbox.netbox_ip_address:
+    netbox_url: "{{ lookup('env', 'NETBOX_URL') }}"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+    state: new
+    data:
+      prefix: "{{ vsphere_platform_config['node_prefix'] }}"
+      role: VIP
+      dns_name: "api.{{ cluster_name }}.{{ base_domain }}"
+      description: "{{ cluster_name }}-Internal-API"
+  register: nb_internal_api_create
+  when:
+    - loadbalancer_type == "internal" or expose_internal_loadbalancers|bool
+    - cluster_state == "present"
+    - internal_api_vip is not defined
+
+- name: set internal API VIP based on new record
+  ansible.builtin.set_fact:
+    internal_api_vip: "{{ nb_internal_api_create.ip_address.address | ansible.netcommon.ipaddr('address') }}"
+    internal_api_cidr: "{{ nb_internal_api_create.ip_address.address }}"
+  when:
+    - internal_api_vip is not defined
+    - nb_internal_api_create is defined
+    - nb_internal_api_create.ip_address is defined
+
+- name: allocate internal ingress VIP
+  netbox.netbox.netbox_ip_address:
+    netbox_url: "{{ lookup('env', 'NETBOX_URL') }}"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+    state: new
+    data:
+      prefix: "{{ vsphere_platform_config['node_prefix'] }}"
+      role: VIP
+      dns_name: "apps.{{ cluster_name }}.{{ base_domain }}"
+      description: "{{ cluster_name }}-Internal-Ingress"
+  register: nb_internal_ingress_create
+  when:
+    - cluster_state == "present"
+    - internal_ingress_vip is not defined
+
+- name: set internal ingress VIP based on new record
+  set_fact:
+    internal_ingress_vip: "{{ nb_internal_ingress_create.ip_address.address | ansible.netcommon.ipaddr('address') }}"
+    internal_ingress_cidr: "{{ nb_internal_ingress_create.ip_address.address }}"
+  when:
+    - internal_ingress_vip is not defined 
+    - nb_internal_ingress_create is defined
+    - nb_internal_ingress_create.ip_address is defined
+
+- name: deallocate internal API VIP
+  netbox.netbox.netbox_ip_address:
+    netbox_url: "{{ lookup('env', 'NETBOX_URL') }}"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+    state: absent
+    data:
+      address: "{{ internal_api_cidr }}"
+  register: nb_internal_api_create
+  when:
+    - cluster_state == "absent"
+    - internal_api_vip is defined
+
+- name: deallocate internal ingress VIP
+  netbox.netbox.netbox_ip_address:
+    netbox_url: "{{ lookup('env', 'NETBOX_URL') }}"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+    state: absent
+    data:
+      address: "{{ internal_ingress_cidr }}"
+  register: nb_internal_ingress_create
+  when:
+    - cluster_state == "absent"
+    - internal_ingress_vip is defined

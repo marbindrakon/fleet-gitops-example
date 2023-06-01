@@ -8,6 +8,10 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: '0'
 stringData:
+{{- if eq .Values.provider.type "OpenStack" }}
   ca.crt: |
+{{ else }}
+  .cacert: |
+{{ end -}}
 {{ indent 4 .Values.provider.providerCAs }}
 {{ end }}

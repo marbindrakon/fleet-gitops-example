@@ -2,8 +2,8 @@
 
 # DNS domain where all managed OCP clusters will be created
 base_domain: "lab.signal9.gg"
-gitops_repo_url: "https://github.com/marbindrakon/rhte-2023-fleet-gitops.git"
-gitops_repo_url_authed: "https://{{ upstream_git_user|urlencode }}:{{ upstream_git_password|urlencode }}@github.com/marbindrakon/rhte-2023-fleet-gitops.git"
+gitops_repo_url: "https://github.com/marbindrakon/fleet-gitops-example.git"
+gitops_repo_url_authed: "https://{{ upstream_git_user|urlencode }}:{{ upstream_git_password|urlencode }}@github.com/marbindrakon/fleet-gitops-example.git"
 cluster_builds_dir: "argocd/clusters/rhte-acm-hub/live/cluster-builds"
 hub_type: acm
 
@@ -19,10 +19,10 @@ loadbalancer_api_shared_frontend: "fe-ocp-api"
 loadbalancer_http_shared_frontend: "fe-ocp-http"
 loadbalancer_https_shared_frontend: "fe-ocp-https"
 loadbalancer_machineapi_shared_frontend: "fe-ocp-machineapi"
-loadbalancer_api_shared_vip: "75.8.216.227"
-loadbalancer_ingress_shared_vip: "75.8.216.227"
+loadbalancer_api_shared_vip: "75.8.222.17"
+loadbalancer_ingress_shared_vip: "75.8.222.17"
 # external_vip_prefix is only used when loadbalancer_frontend_mode is 'dedicated'
-external_vip_prefix: "172.18.16.0/24"
+external_vip_prefix: "75.8.222.16/28"
 
 # Multiple DNS providers can be enabled for split-horizon use cases
 enabled_dns_providers:
@@ -56,6 +56,8 @@ hashicorp_vault:
     pull-secret: ocp-pull-secret
     openstack-cloud: opensnack-cloud-config
     node-ssh: rhte-cluster-ssh-key
+    vsphere-credentials: vsphere-credentials
+    install-config: "{{ cluster_name }}-install-config"
 
 # CA bundle to be added to provisioned clusters, may not match platform
 # bundle. Should include the root CA for the OCP API even if it is normally
@@ -132,7 +134,7 @@ platform_configs:
   openstack:
     vip_network: lab-net
     use_existing_image: true
-    glance_image: rhcos-4.12.0
+    glance_image: rhcos-4.12.17
     cluster_sizes:
       sandbox:
         controller_count: 3
@@ -206,6 +208,143 @@ platform_configs:
       mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
       emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
       -----END CERTIFICATE-----
+  vsphere:
+    node_prefix: "172.18.16.0/24"
+    network: ocp0-infra
+    vcenter: xna-vcenter.lab.signal9.gg
+    cluster: XNA-ESX-1
+    datacenter: XNA
+    datastore: CEPH-NVME
+    disk_type: thin
+    cluster_sizes:
+      sandbox:
+        controller_count: 3
+        controller_vcpu: 4
+        controller_ram: 16384
+        controller_disk: 120
+        worker_count: 2
+        worker_vcpu: 2
+        worker_ram: 4096
+        worker_disk: 120
+      small:
+        controller_count: 3
+        controller_vcpu: 4
+        controller_ram: 16384
+        controller_disk: 120
+        worker_count: 3
+        worker_vcpu: 4
+        worker_ram: 8196
+        worker_disk: 120
+      medium:
+        controller_count: 3
+        controller_vcpu: 8
+        controller_ram: 16384
+        controller_disk: 256
+        worker_count: 3
+        worker_vcpu: 8
+        worker_ram: 16384
+        worker_disk: 120
+      large:
+        controller_count: 3
+        controller_vcpu: 8
+        controller_ram: 32768
+        controller_disk: 256
+        worker_count: 6
+        worker_vcpu: 8
+        worker_ram: 16384
+        worker_disk: 256
+    platform_ca_bundle: |
+      -----BEGIN CERTIFICATE-----
+      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
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      MIICkTCCAhagAwIBAgIUX1Cm8VWt4ki4+8XH7oKsYYKJM+QwCgYIKoZIzj0EAwIw
+      dzELMAkGA1UEBhMCVVMxETAPBgNVBAgMCEFya2Fuc2FzMQ8wDQYDVQQHDAZSb2dl
+      cnMxFTATBgNVBAoMDFNpZ25hbDkgTGFiczEMMAoGA1UECwwDWE5BMR8wHQYDVQQD
+      DBZTaWduYWw5IFJvb3QgQXV0aG9yaXR5MB4XDTIxMDMwMTA0MDMwNFoXDTQxMDIy
+      NDA0MDMwNFowdzELMAkGA1UEBhMCVVMxETAPBgNVBAgMCEFya2Fuc2FzMQ8wDQYD
+      VQQHDAZSb2dlcnMxFTATBgNVBAoMDFNpZ25hbDkgTGFiczEMMAoGA1UECwwDWE5B
+      MR8wHQYDVQQDDBZTaWduYWw5IFJvb3QgQXV0aG9yaXR5MHYwEAYHKoZIzj0CAQYF
+      K4EEACIDYgAE5w5BHLiaagf5eSNkQYuDIdyWe7ULLY2z2qAP1fKXM+RrSHQQb5x1
+      Q9+IhQRhf7exw/pJS5Vs1R8IyQ3B8r6xz885w6+Fk6iyMAlFn979RU6V5lbxMRGG
+      Vxq/CEL/iorVo2MwYTAdBgNVHQ4EFgQUYfO+q+KnTtIDK5OFXsVZ/D0ziiUwHwYD
+      VR0jBBgwFoAUYfO+q+KnTtIDK5OFXsVZ/D0ziiUwDwYDVR0TAQH/BAUwAwEB/zAO
+      BgNVHQ8BAf8EBAMCAYYwCgYIKoZIzj0EAwIDaQAwZgIxAJLOIPP9J1/mttvGdQtM
+      Prnm+r+JzVu8vd0r2HxgwloEkElTr29S+DAAE8XlUpoXpQIxALEd+sYGr1qENJqr
+      vHOvuo0diFSUxjvTjowus6kM6nZi1JR4rMycICsGgujg8zwVAw==
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      MIIENzCCAx+gAwIBAgIJAMvxWviVIyILMA0GCSqGSIb3DQEBCwUAMIGmMQswCQYD
+      VQQDDAJDQTEXMBUGCgmSJomT8ixkARkWB3ZzcGhlcmUxGjAYBgoJkiaJk/IsZAEZ
+      FgpzaWduYWw5LmdnMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEj
+      MCEGA1UECgwaeG5hLXZjZW50ZXIubGFiLnNpZ25hbDkuZ2cxGzAZBgNVBAsMElZN
+      d2FyZSBFbmdpbmVlcmluZzAeFw0yMTAzMTQwMTE2MTRaFw0zMTAzMTIwMTE2MTRa
+      MIGmMQswCQYDVQQDDAJDQTEXMBUGCgmSJomT8ixkARkWB3ZzcGhlcmUxGjAYBgoJ
+      kiaJk/IsZAEZFgpzaWduYWw5LmdnMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2Fs
+      aWZvcm5pYTEjMCEGA1UECgwaeG5hLXZjZW50ZXIubGFiLnNpZ25hbDkuZ2cxGzAZ
+      BgNVBAsMElZNd2FyZSBFbmdpbmVlcmluZzCCASIwDQYJKoZIhvcNAQEBBQADggEP
+      ADCCAQoCggEBAKwYcfGszX8pGWeNFPgRLd2X8Flog838IUr2FMGJ41I3UCMF7J3E
+      nMaQ/dczQd4uq13kQNcsk/slVrifpI6jq17bRjDxrKP3tTGUM8xxgRCsyHVvn4Uu
+      MYIj6c0F6ImV0ocNGbhekctPCwpGRCgrPNr6WmdBQM8cZzMnJtCQY2rfSZNFjFFV
+      BfVD5oJp8Pmwvhh7wn7Azv4QXNBgr8OIZ7RvGbLPYnwhX5fiscgjpcShCaCNolN4
+      Rkgx3tYIVYn0ZHB/WtAnKg3kV+woe47qosGZP54NZZ09H/rR5vgBN7rSNgI7obUi
+      jbwKDy/5UNcmaoxIEXHGxUme4yPAgQnPLg0CAwEAAaNmMGQwHQYDVR0OBBYEFJhR
+      eYVsQI0fllxk3CvJdxyIuqZ+MB8GA1UdEQQYMBaBDmVtYWlsQGFjbWUuY29thwR/
+      AAABMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqGSIb3
+      DQEBCwUAA4IBAQBIPWGV+XH+m5J6bGqBv/FlKgU71kb73WtwomIAXjoCcBKLOrAX
+      zse8wjHjvFhGdEyg6iTfyIJPQM3J1WqSDd1M5ON9rMHrabpUbDTVKOzEsYrfff1s
+      Ti/84evZKN7aSvCx7bvMld5pb/bwMQnfATc0jURFVNxzF6Z3UQEQrtemhkEyzBmT
+      jF+yQAUP+Rha0Vd+6OWYVtTqEFC4WODf71ZmSoxS92pc+Vfc4ieke/V+sGYPG3Rc
+      56kOPXSPmgy6aSc4fWobUOyr8UwnmXSu9w6hiCXcvVdQ1bdfwpvJJvu6AaFe5VHO
+      wbs/O0l7+0wDrxQkAwW8COIXy0lssBBTVGw2
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      MIIDGzCCAqKgAwIBAgICEAUwCgYIKoZIzj0EAwIwdzELMAkGA1UEBhMCVVMxETAP
+      BgNVBAgMCEFya2Fuc2FzMQ8wDQYDVQQHDAZSb2dlcnMxFTATBgNVBAoMDFNpZ25h
+      bDkgTGFiczEMMAoGA1UECwwDWE5BMR8wHQYDVQQDDBZTaWduYWw5IFJvb3QgQXV0
+      aG9yaXR5MB4XDTIwMDMxMzAwMDAwMFoXDTMxMDMxNTAyNDM0MVowZzELMAkGA1UE
+      BhMCVVMxETAPBgNVBAgMCEFya2Fuc2FzMQ8wDQYDVQQHDAZSb2dlcnMxEDAOBgNV
+      BAoMB1NpZ25hbDkxFTATBgNVBAsMDFNpZ25hbDkgTGFiczELMAkGA1UEAwwCQ0Ew
+      ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC8CBkWzGJVsQwsQmDWBQzn
+      yRjYore34YguwpOCJhlHFENMZaW8mmfnHN5DvadQ+ZMcoUHvcX7TpU6WoM1Baxni
+      JdQ9CPJKMpZMEG/oyqDI4JWlMMATypm+b6d0a0LlvWsABR3w5/8ES/hyh/8Tu6mG
+      xxdoPmKIUnAZenkeT+Ghr4NqQhGghjFy6N//TGx0L5fPtN1ACXhPVpKz79jpOC1C
+      8pg6cQ1LdtP9AcZFrFyQTSUUrrd9fbq1Effo2hrlacB3r4R0SNFfobrfkw3BzAoO
+      TBgrb+VAGxey3xNu2QrhdDtgRk1Ugy7Vq2dgAPAvME/quvWXZqCBCelgw/62ElLn
+      AgMBAAGjYzBhMB0GA1UdDgQWBBSqVGvNI/tuF0TjP6DKIDcM49eO+TAfBgNVHSME
+      GDAWgBRh876r4qdO0gMrk4VexVn8PTOKJTAPBgNVHRMBAf8EBTADAQH/MA4GA1Ud
+      DwEB/wQEAwIBhjAKBggqhkjOPQQDAgNnADBkAjBA+iCbYTNHW4+tY+s8e1OeHmUz
+      RlAO/N9lDxp7lEIEbP4DScZ+Nv1phtVFftGE2qsCMG2krf0kErTReuwi+GGZ0BIX
+      Ea7bzyWtv6LK1vOSfK8CM2ce8U7WL+MbGFODht/ywg==
+      -----END CERTIFICATE-----
 
   infra_env_hybrid:
     # Search for baremetal nodes in Netbox will be limited to this tag
@@ -219,10 +358,18 @@ platform_configs:
       - "bond1.19"
       - "ens224"
     vmware_config:
-      datastore: "CEPH-NVME"
+      datacenter_name: "XNA"
+      allowed_clusters:
+        # Cluster nodes will be built on 
+        - name: "XNA-ESX"
+          datastore_match: "CEPH-NVME"
+        - name: "XNA-TEMP-1"
+          datastore_match: "XNA-ESX-TEMP-1-SAN"
+        - name: "XNA-TEMP-2"
+          datastore_match: "XNA-ESX-TEMP-1-SAN"
+      network_backing_type: DISTRIBUTED_PORTGROUP
       node_port_group: "ocp0-infra"
       storage_port_group: "Ceph-ODF"
-      cluster_name: "XNA-ESX-1"
     use_baremetal_operator: false
     cluster_sizes:
       sandbox:

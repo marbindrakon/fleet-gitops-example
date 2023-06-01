@@ -1,0 +1,20 @@
+{{- if eq .Values.provider.type "vSphere" -}}
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: {{ .Values.cluster.name }}-install-config
+  namespace: {{ .Values.cluster.name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault
+  target:
+    name: {{ .Values.cluster.name }}-install-config
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: {{ .Values.provider.installConfigVault }}
+{{ end }}

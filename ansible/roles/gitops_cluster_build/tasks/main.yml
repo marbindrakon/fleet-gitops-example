@@ -1,5 +1,18 @@
 ---
 # tasks file for gitops_cluster_build
+- name: write install config to vault for vsphere
+  community.hashi_vault.vault_write:
+    url: "{{ hashicorp_vault['url'] }}"
+    auth_method: jwt
+    mount_point: "{{ hashicorp_vault['auth_mount'] }}"
+    role_id: "{{ hashicorp_vault['auth_role'] }}"
+    jwt: "{{ vault_jwt }}"
+    path: "{{ hashicorp_vault['secret_base_path'] }}/data/{{ hashicorp_vault['cluster_secrets']['install-config'] }}"
+    data:
+      data:
+        install-config.yaml: "{{ lookup('template', 'vsphere-install-config.yaml.j2') }}"
+  no_log: true
+  when: cluster_state == "present" and cluster_platform == "vsphere"
 
 - name: create temporary directory for gitops repo
   ansible.builtin.tempfile:
@@ -102,3 +115,14 @@
   ansible.builtin.file:
     path: "{{ gitops_temp_dir.path }}"
     state: absent
+
+- name: delete install config from vault for vsphere
+  community.hashi_vault.vault_delete:
+    url: "{{ hashicorp_vault['url'] }}"
+    auth_method: jwt
+    mount_point: "{{ hashicorp_vault['auth_mount'] }}"
+    role_id: "{{ hashicorp_vault['auth_role'] }}"
+    jwt: "{{ vault_jwt }}"
+    path: "{{ hashicorp_vault['secret_base_path'] }}/data/{{ hashicorp_vault['cluster_secrets']['install-config'] }}"
+  no_log: true
+  when: cluster_state == "absent" and cluster_platform == "vsphere"
