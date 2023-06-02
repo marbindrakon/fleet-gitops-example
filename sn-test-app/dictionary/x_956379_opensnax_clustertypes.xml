@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><database>
-    <element db_object_id="31e2d1c82fbca110d3fc4ae72799b640" label="clustertypes" max_length="40" name="x_956379_opensnax_clustertypes" type="collection">
-        <element label="name" max_length="40" name="name" type="string"/>
-        <element attributes="edge_encryption_enabled=true" default="javascript:global.getNextObjNumberPadded();" label="Number" max_length="40" name="number" type="string"/>
-    </element>
-</database>
